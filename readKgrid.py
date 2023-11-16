@@ -135,20 +135,20 @@ def Kpath(path,n):
 
 if __name__ == '__main__':
     qz = np.array([-13.01,0,7.48])
-    qz = qz/np.linalg.norm(qz)
+    qz = qz
     qy = np.array([0,0.5,0])
     qx = np.array([0.5,0,0])#np.cross(qy,qz/np.linalg.norm(qz))
 
     npoints = 10
 
-    kpath = fromgridtoKPOINTS(qz,qy, [-0.40,0.40], [0,0], 1000,1)#np.array(Kpath([-qz, np.array([0.,0.,0.]), qz],npoints))
+    kpath = fromgridtoKPOINTS(qz,qy, [-0.10,0.10], [0,0], 1000,1)#np.array(Kpath([-qz, np.array([0.,0.,0.]), qz],npoints))
     
     with open('Ag2Te\MBJ_thirdtry\IBZKPT') as f:
         ibzkpt = f.readlines()
     
     nkibz = int(ibzkpt[1])
     
-    with open('Ag2Te\perpLineHighRez\KPOINTS','w') as f:
+    with open('Ag2Te\\perpLineHighRezLong\\KPOINTS','w') as f:
         f.write('Kpoints generated automatically by F.B.\n')
         f.write('{}\n'.format(len(kpath)+nkibz))
         f.write('Reciprocal lattice\n')

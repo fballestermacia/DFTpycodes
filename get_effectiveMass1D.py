@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import simps
+from scipy.interpolate import splev, splrep
 from numpy.polynomial.polynomial import polyder, polyval, polyfit
 
 def fromKPOINTStoline(kpointsfile='KPOINTS', vec=np.array([0.5,0.,0.]), weightfilter = None):
@@ -113,16 +114,16 @@ def get_mzeffs(coefs, band, polyorder):
     derz = polyder(pol,2)
     
     derzvals = polyval(coefs,derz)
+
     
     factor = 1#1000*(6.582e-16)**2/0.510e6*3e8**2/1e-10**2*4*np.pi**2
     
     
     mz = np.power(derzvals,-1)*factor
-    
     #mz = np.where(mz<0, 0, mz)
     
     enval = efermi#np.min(band)
-    sigma = 0.00005
+    sigma = 0.0005
     a0=1/(sigma*np.sqrt(2*np.pi))
     
     envals = np.linspace(np.min(band), np.min(band)+250/1000*0.0367493, 10000)
@@ -145,7 +146,7 @@ if __name__ == '__main__':
     
     qz = np.array([-13.01,0,7.48])/np.linalg.norm(np.array([-13.01,0,7.48]))
     
-    bands, efermi, coefs, occupation = fromOUTCARtoplot1D(outcarfile = 'Ag2Te\perpLineHighRez\OUTCAR', kpointsfile = 'Ag2Te\perpLineHighRez\KPOINTS', vec=qz, weightfilter = 0.)
+    bands, efermi, coefs, occupation = fromOUTCARtoplot1D(outcarfile = 'Ag2Te\\perpLineHighRezLong\\OUTCAR', kpointsfile = 'Ag2Te\\perpLineHighRezLong\\KPOINTS', vec=qz, weightfilter = 0.)
     #print(efermi)
     #coefs = np.abs(coefs)
     #print(occupation)
@@ -170,15 +171,13 @@ if __name__ == '__main__':
     
     band = ((dummy)[int(index[0])])*0.0367493 #hartree
     
-    polyorders = [12]#(np.arange(10,20))*2
+    polyorders = [18]#(np.arange(3,10))*2
     
     scaling = 1/1.88973 #Bohr
     coefs *= scaling
     
     
-    
-    Enlim = 0.8
-    print(Enlim)
+    Enlim = 0.4
     trues = np.where(band<Enlim)
     coefs = coefs[trues[0]]
     band = band[trues[0]]
@@ -214,14 +213,14 @@ if __name__ == '__main__':
         mzeffs.append(np.sum(mz*bandgaussian)/simps(bandgaussian))'''
     
     fig1 = plt.figure()
-    fig1.set_size_inches(15, 8)
+    fig1.set_size_inches(10, 6)
     ax1 = fig1.add_subplot(221)
     ax2 = fig1.add_subplot(222)
     ax3 = fig1.add_subplot(223)
     ax4 = fig1.add_subplot(224)
     
     fig2 = plt.figure()
-    fig2.set_size_inches(15, 8)
+    fig2.set_size_inches(10, 6)
     
     ax5 = fig2.add_subplot(111)
        
@@ -247,11 +246,11 @@ if __name__ == '__main__':
         ax5.vlines([efermidoped10a*1000,  efermidopeda*1000], 0.15,0.35, colors=['r','k'])
         ax5.vlines([efermidoped10b*1000,  efermidopedb*1000], 0.15,0.35, colors=['r','k'], linestyles='--')
     
-    ax1.set_ylim(0.275,0.365)
+    #ax1.set_ylim(0.275,0.365)
     ax2.set_ylim(-5,7.5)
     ax3.set_ylim(-5,5)
-    ax4.set_ylim(0.05,0.35)
-    ax5.set_ylim(0.05,0.35)
+    #ax4.set_ylim(0,0.35)
+    #ax5.set_ylim(0,0.35)
     
     
     plt.legend()
