@@ -134,13 +134,15 @@ def get_mzeffs(coefs, band, polyorder):
     #print("m_effZ = ", mzeff)
     
     mzeffs = []
+    iderzvals = []
     
     for enval2 in envals:
         bandgaussian = gausiana(band,enval2,sigma,a0)
-        mzeffs.append(np.sum(mz*bandgaussian)/simps(bandgaussian))
+        iderzvals.append(np.sum(derzvals*bandgaussian)/simps(bandgaussian))
+        mzeffs.append(np.power(np.sum(derzvals*bandgaussian)/simps(bandgaussian),-1))
     
     
-    return mzeffs, envals, derzvals, pol, enval, mz
+    return mzeffs, envals, iderzvals, pol, enval, mz
 
 if __name__ == '__main__':
     
@@ -171,16 +173,16 @@ if __name__ == '__main__':
     
     band = ((dummy)[int(index[0])])*0.0367493 #hartree
     
-    polyorders = [18]#(np.arange(3,10))*2
+    polyorders = [20]#(np.arange(3,10))*2
     
     scaling = 1/1.88973 #Bohr
     coefs *= scaling
     
     
-    Enlim = 0.4
+    '''Enlim = 0.4
     trues = np.where(band<Enlim)
     coefs = coefs[trues[0]]
-    band = band[trues[0]]
+    band = band[trues[0]]'''
     
     
     '''pol = polyfit(coefs,band, polyorder)
@@ -234,9 +236,10 @@ if __name__ == '__main__':
         ax1.plot(coefs, polyval(coefs,pol), label='C = {}'.format(polyorder))
         
         
-        ax2.plot(coefs,derzvals, label='C = {}'.format(polyorder))
+        ax2.plot(envals,derzvals, label='C = {}'.format(polyorder))
         
-        ax3.plot(coefs,mz, label='C = {}'.format(polyorder))
+        #ax3.plot(coefs,mz, label='C = {}'.format(polyorder))
+        ax3.plot(envals,np.power(derzvals,-1), label='C = {}'.format(polyorder))
 
         ax4.plot(envals, mzeffs, label='C = {}'.format(polyorder))
         #print(mzeffs[0])
@@ -247,8 +250,8 @@ if __name__ == '__main__':
         ax5.vlines([efermidoped10b*1000,  efermidopedb*1000], 0.15,0.35, colors=['r','k'], linestyles='--')
     
     #ax1.set_ylim(0.275,0.365)
-    ax2.set_ylim(-5,7.5)
-    ax3.set_ylim(-5,5)
+    #ax2.set_ylim(-5,7.5)
+    #ax3.set_ylim(-5,5)
     #ax4.set_ylim(0,0.35)
     #ax5.set_ylim(0,0.35)
     

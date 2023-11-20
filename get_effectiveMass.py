@@ -1,14 +1,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 from readKgrid import fromOUTCARtoplot
 from scipy.integrate import simps
 from numpy.polynomial.polynomial import polyder, polyval, polyfit
-
+from scipy.interpolate import griddata
 
 def directionalPolyFit(band,xs, ys, polyorder):
     
     
-    polyxs = []#polyfit(xs,band[:,0], polyorder)
+    polyxs = []
     polyys = []
     for i in range(len(ys)):
         polyxs.append(polyfit(xs,band[:,i], polyorder))
@@ -20,200 +21,143 @@ def directionalPolyFit(band,xs, ys, polyorder):
     return polyxs, polyys
 
 
-def gausiana(x,center,sigma,a0):
-    return a0*np.exp(-(x-center)**2/sigma**2/2)
+def gausiana(x,center,sigma):
+    a0 = 1/(sigma*np.sqrt(2*np.pi))
+    return a0*np.exp(-(np.power(x-center,2))/(2*sigma**2))
 
 if __name__ == '__main__':
+    #CONSTANTS
+    eV2Hartree = 1/27.2113845#0.0367493
+    polyorder = 8
+    sigx = 0.0002
+    sigy = sigx
+    #########
+
+
     qz = np.array([-13.01,0,7.48])
     qz = qz/np.linalg.norm(qz)
-    qy = np.array([0,1,0])
-    qx = np.cross(qy, qz/np.linalg.norm(qz))#np.array([0.5,0,0])
-    
-    bands, efermi, qxvals, qyvals, occupation = fromOUTCARtoplot(outcarfile='Ag2Te\PerpGrid\OUTCAR',kpointsfile="Ag2Te\PerpGrid\KPOINTS", qx=qz, qy=qy, weightfilter = 0)
-    #bands, efermi, qxvals, qyvals, occupation = fromOUTCARtoplot(outcarfile='Ag2Te\ArchivosMartin\GM_MBJ\OUTCAR_MBJ',kpointsfile="Ag2Te\ArchivosMartin\GM_MBJ\KPOINTS_MBJ_BS", qx=qx, qy=qy, weightfilter = 0)
 
+    qy = np.array([0,1,0])
+
+    qx = np.cross(qy, qz/np.linalg.norm(qz))
+
+    bands, efermi, qxvals, qyvals, occupation = fromOUTCARtoplot(outcarfile='Ag2Te\\ArchivosMartin\\GM_MBJ\\OUTCAR_MBJ',kpointsfile="Ag2Te\\ArchivosMartin\\GM_MBJ\\KPOINTS_MBJ_BS", qx=qx, qy=qy, weightfilter = 0)
+    
     dummy = np.transpose(bands[0])
     dummyoc = np.transpose(occupation[0])
 
     index = np.sum(dummyoc, axis=0)
 
+    band = ((dummy)[int(index[0])])
+    band = (band-np.min(band))*eV2Hartree
 
+    
+    
 
-    band = ((dummy)[int(index[0])])*0.0367493#((dummy)[int(index[0]+1)]-efermi)/0.0367493 #in hartree#*1000 #in meV
-    
-    #band -= np.min(band)
-    polyorder = 8
-    
-    scaling = 1/1.88973 #Bohr
-    qxvals *= scaling
-    qyvals *= scaling
-    
     xs, ylen = np.unique(qxvals, return_counts=True) 
-    ys, xlen = np.unique(qyvals, return_counts=True) 
+    ys, xlen = np.unique(qyvals, return_counts=True)
     
-    
-    band2 = band.reshape(xlen[0], ylen[0])
-    
-    
+
+    shape = [ylen[0], xlen[0]]
+
+    band2 = band.reshape(shape[::-1])
     polyxs, polyys = directionalPolyFit(band2,xs, ys, polyorder)
-    
+
     derx = polyder(polyxs,2, axis=1)
     dery = polyder(polyys,2, axis=1)
-    
-    
+
     derxvals = polyval(xs, np.transpose(derx), tensor=True)
-    deryvals = np.transpose(polyval(ys, np.transpose(dery), tensor=True))
-    
-    '''derxvals = []
-    deryvals = []
-    
-    for dx in derx:
-        derxvals.append(np.array(polyval(xs,dx)))
-        
-    for dy in dery:
-        deryvals.append(np.array(polyval(ys,dy)))
-    
-    derxvals = np.array(derxvals)
-    deryvals = np.array(deryvals) '''
-    
-    '''derxvals = np.where(derxvals<0, 0, derxvals)
-    deryvals = np.where(deryvals<0, 0, deryvals)'''
-    
-    factor = 1#1000*(6.582e-16)**2/0.510e6*3e8**2/1e-10**2*4*np.pi**2
-    
-    
-    mx = np.power(derxvals,-1)*factor
-    my = np.power(deryvals,-1)*factor
-    
-    mx = np.where(mx<0, 0, mx)
-    #mx = np.where(mx>0.5, 0.5, mx)
-    
-    #my = np.where(my<0, 0, my)
-    #my = np.where(my>0.4, 0.4, my)
-    
-    
-    #efermi = 8.004260389831682
+    deryvals = polyval(ys, np.transpose(dery), tensor=True)
 
-    enval = 0.283#efermi*0.0367493#np.min(band)
-    sigmax = 0.0005
-    sigmay = 0.0005
-    a0x=1/(sigmax*np.sqrt(2*np.pi))
-    a0y=1/(sigmay*np.sqrt(2*np.pi))
+    #print(derxvals)
 
-    envals = np.linspace(np.min(band)+0.0015, 0.3, 1000)#np.min(band)+0.01, 1000)
+    efermi = 26.821041107177734/1000 #26 meVs
     
-    bandgaussianx = gausiana(band,enval,sigmax,a0x)
-    bandgaussiany = gausiana(band,enval,sigmay,a0y)
+    envals = np.linspace(np.min(band2), np.min(band2)+0.15*eV2Hartree, 200)
+
     
+    xx = np.linspace(np.min(xs), np.max(xs), 61)
+    yy = np.linspace(np.min(ys), np.max(ys), 31)
+
+    X,Y = np.meshgrid(xx,yy)
+
+    gridddx = griddata(np.transpose([qxvals,qyvals]),np.transpose(derxvals).flatten(),(X,Y), method='cubic')
+    gridddy = griddata(np.transpose([qxvals,qyvals]),deryvals.flatten(),(X,Y), method='cubic')
+    gridE = griddata(np.transpose([qxvals,qyvals]),band2.flatten(),(X,Y), method='cubic')
+
+    for en in envals:
+        #Cicle through all data in the grgrid    x_idev2=0
+        x_idev2=0
+        x_weight=0
+        y_idev2=0
+        y_weight=0
+        for i in range(np.shape(gridE)[0]):
+            for j in range(np.shape(gridE)[1]):
+                #sum velocities
+                x_idev2=x_idev2+gausiana(gridE[i,j], en, sigx)*gridddx[i,j]
+                y_idev2=y_idev2+gausiana(gridE[i,j], en, sigy)*gridddy[i,j]
+                #count summed terms
+                x_weight=x_weight+gausiana(gridE[i,j], en, sigx)
+                y_weight=y_weight+gausiana(gridE[i,j], en, sigy)
+        try:
+            idevs=np.vstack([idevs,np.array([en,x_idev2/x_weight,y_idev2/y_weight])])
+        except NameError:
+            idevs=np.array([en,x_idev2/x_weight,y_idev2/y_weight])
+
+    Energies, ddxvals, ddyvals = np.transpose(idevs)
+
+    x_idev2=0
+    x_weight=0
+    y_idev2=0
+    y_weight=0
+    for i in range(np.shape(gridE)[0]):
+        for j in range(np.shape(gridE)[1]):
+            #sum velocities
+            x_idev2=x_idev2+gausiana(gridE[i,j], efermi*eV2Hartree, sigx)*gridddx[i,j]
+            y_idev2=y_idev2+gausiana(gridE[i,j], efermi*eV2Hartree, sigy)*gridddy[i,j]
+            #count summed terms
+            x_weight=x_weight+gausiana(gridE[i,j], efermi*eV2Hartree, sigx)
+            y_weight=y_weight+gausiana(gridE[i,j], efermi*eV2Hartree, sigy)
+    try:
+        idevsf=np.vstack([idevsf,np.array([en,x_idev2/x_weight,y_idev2/y_weight])])
+    except NameError:
+        idevsf=np.array([en,x_idev2/x_weight,y_idev2/y_weight])
+    Energiesf, ddxvalsf, ddyvalsf = np.transpose(idevsf)
     
-    mxeff = np.sum(mx*bandgaussianx.reshape([len(mx[:,0]),len(mx[0])]))/simps(bandgaussianx)
-    myeff = np.sum(my*bandgaussiany.reshape([len(my[:,0]),len(my[0])]))/simps(bandgaussiany)
-    
-    ratio = np.true_divide(mxeff,myeff, out=np.zeros_like(mxeff), where=myeff!=0)
-    
-    print("m_effX = ", mxeff)
-    print("m_effY = ", myeff)
-    print("ratio = ", ratio)  
-    
-    
-    mxeffs = []
-    myeffs = []
-    
-    for enval2 in envals:
-        bandgaussian = gausiana(band,enval2,sigmax,a0x)
-        mxeffs.append(np.sum(mx*bandgaussian.reshape([len(mx[:,0]),len(mx[0])]))/simps(bandgaussian))
-        
-        bandgaussian = gausiana(band,enval2,sigmay,a0y)
-        myeffs.append(np.sum(my*bandgaussian.reshape([len(my[:,0]),len(my[0])]))/simps(bandgaussian))
-    
+    print(ddxvalsf**-1,ddyvalsf**-1)
+
+    ens = Energies/eV2Hartree
+    mxeffs = ddxvals**-1
+    myeffs = ddyvals**-1
+
     plt.figure()
-    plt.plot(envals, mxeffs)
-    plt.plot(envals,myeffs)
-    plt.vlines(enval, 0, 0.4, 'r')
+    plt.plot(ens, mxeffs)
+    plt.plot(ens, myeffs)
+    plt.vlines(efermi, 0, 0.35, 'r')
 
     plt.figure()
     plt.plot(envals,np.array(mxeffs)/np.array(myeffs))
     
-    dxticks = np.array([0,5e3,1e4,1.5e4,2e4,2.5e4,3e4])
-    dyticks = np.array([0,2e4,4e4,6e4,8e4])
+    band2 = band2/eV2Hartree*1000
+
+    enval=efermi*eV2Hartree
+    X,Y = qxvals,qyvals
+    cmap = mpl.cm.viridis
+    norm = mpl.colors.Normalize(vmin=np.min(band2), vmax= np.max(band2))
+
+
+    nlev = 10
     
-    mxticks = np.array([0,0.1,0.2,0.3,0.4,0.5])
-    myticks = np.array([0,0.5,0.1,0.15,0.2,0.25,0.3,0.35,0.4])
-    
-    X,Y = np.meshgrid(xs,ys)
-    
-    nlev = 20
-    
-    fig = plt.figure()
+    '''fig = plt.figure()
     fig.set_size_inches(15, 8)
     ax = plt.subplot(111)
-    drawing = ax.tricontourf(qxvals,qyvals,band, levels = nlev)
+    drawing = ax.imshow(band2,interpolation='bilinear',cmap=cmap,norm=norm,
+                        extent=(np.min(qxvals),np.max(qxvals),np.min(qyvals),np.max(qyvals)))#ax.tricontourf(qxvals,qyvals,band, levels = nlev)
     colorbar = fig.colorbar(drawing, ax = ax)
     ax.tricontour(qxvals,qyvals,band, colors='k', levels = nlev)
     ax.scatter(qxvals,qyvals,s=3,c='k')
     ax.scatter(0,0,s=10,c='r')
 
-    fermilevel = ax.tricontour(qxvals, qyvals, band, [enval], colors='r', zorder=10)
-    
-    
-    fig = plt.figure()
-    fig.set_size_inches(15, 8)
-    ax = plt.subplot(111)
-    plt.title("d2E/dKx2")
-    drawing = ax.contourf(X,Y,derxvals, levels = np.linspace(0, np.max(derxvals), 10*nlev), extend = 'both')
-    colorbar = fig.colorbar(drawing, ax = ax, ticks=dxticks)
-    ax.contour(X,Y,derxvals, colors='k', levels = nlev)
-    ax.scatter(qxvals,qyvals,s=3,c='k')
-    ax.scatter(0,0,s=10,c='r')
-    
-    fermilevel = ax.tricontour(qxvals, qyvals, band, [enval], colors='r', zorder=100)
-    
-    fig = plt.figure()
-    fig.set_size_inches(15, 8)
-    ax = plt.subplot(111)
-    plt.title("d2E/dKy2")
-    drawing = ax.contourf(X,Y,deryvals, levels = np.linspace(0, np.max(deryvals), 10*nlev), extend = 'both')
-    colorbar = plt.colorbar(drawing, ax = ax, ticks=dyticks)
-    ax.contour(X,Y,deryvals, colors='k', levels = nlev)
-    ax.scatter(qxvals,qyvals,s=3,c='k')
-    ax.scatter(0,0,s=10,c='r')
-    
-    fermilevel = ax.tricontour(qxvals, qyvals, band, [enval], colors='r', zorder=10)
-    
-    fig = plt.figure()
-    fig.set_size_inches(15, 8)
-    ax = plt.subplot(111)
-    plt.title("mx")
-    drawing = ax.contourf(X,Y,mx, levels = np.linspace(0, np.max(mx), 5*nlev))
-    colorbar = fig.colorbar(drawing, ax = ax,ticks=mxticks)
-    ax.contour(X,Y,mx, colors='k', levels = nlev)
-    ax.scatter(qxvals,qyvals,s=3,c='k')
-    ax.scatter(0,0,s=10,c='r')
-    fermilevel = ax.tricontour(qxvals, qyvals, band, [enval], colors='r', zorder=10)
-    
-    fig = plt.figure()
-    fig.set_size_inches(15, 8)
-    ax = plt.subplot(111)
-    plt.title("my")
-    drawing = ax.contourf(X,Y,my, levels = np.linspace(0, np.max(my), 5*nlev), extend = 'both')
-    colorbar = fig.colorbar(drawing, ax = ax,ticks=mxticks)
-    ax.contour(X,Y,my, colors='k', levels = nlev)
-    ax.scatter(qxvals,qyvals,s=3,c='k')
-    ax.scatter(0,0,s=10,c='r')
-    
-    fermilevel = ax.tricontour(qxvals, qyvals, band, [enval], colors='r', zorder=10)
-
-    
-    fig = plt.figure()
-    fig.set_size_inches(15, 8)
-    ax = plt.subplot(111)
-    plt.title("ratio")
-    drawing = ax.contourf(X,Y,mx/my, levels = np.linspace(0, np.max(mx/my), 5*nlev), extend = 'both')
-    colorbar = fig.colorbar(drawing, ax = ax)
-    ax.contour(X,Y,mx/my, colors='k', levels = nlev)
-    ax.scatter(qxvals,qyvals,s=3,c='k')
-    ax.scatter(0,0,s=10,c='r')
-    
-    fermilevel = ax.tricontour(qxvals, qyvals, band, [enval], colors='r', zorder=10)
+    fermilevel = ax.tricontour(qxvals, qyvals, band, [enval], colors='r', zorder=10)'''
 
     plt.show()
