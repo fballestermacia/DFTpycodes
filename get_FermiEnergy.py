@@ -77,7 +77,7 @@ Energy, DOS, iDOS, Emax, Emin, Erange, NEDOS, Efermi = fromDOSCARtoarray( doscar
 dfile = open(doscar).readlines()
 
 vol = float(dfile[1].strip().split()[0])
-    
+print(vol)  
 initTemp = float(dfile[2].strip())
 
 infoline = [float(x) for x in dfile[5].strip().split()]
@@ -97,25 +97,27 @@ vol = np.dot(a1,np.cross(a2,a3))
 
 n = (1.65e18)*10 #/cm^3 #/(1e8)**3
 
-
-
+alat = 13.5188898664
+#vol *= 1/alat 
 
 print('vol=',vol)
+
+
 
 doping_vol=  n*vol/((1e8)**3)
 
 print('doping*vol = ', doping_vol)
 
-Es = np.linspace(0, 250, 5000)
+Es = np.linspace(0, 450, 5000)
 
 #print(integrated_dos(5.1, cte.m_e))
 
 
-meff = 0.18983862787130684#0.1
+meff = 0.12#0.1
 
 #print('112/vol = ', 112/vol)
-print('efermi = ',Dopingtofermi(n,meff=meff, iguess=50))
-print('dop_fermi = ',fermitoDoping(Dopingtofermi(n,meff=meff, iguess=50),meff = meff))
+print('efermi = ',Dopingtofermi(n,meff=meff, iguess=100))
+print('dop_fermi = ',fermitoDoping(Dopingtofermi(n,meff=meff, iguess=100),meff = meff))
 #print('sumDOS/vol = ', np.sum((DOS[Energy <= Efermi+0.1])[-1])/vol)
 
 ig = []

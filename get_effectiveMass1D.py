@@ -126,7 +126,7 @@ def get_mzeffs(coefs, band, polyorder):
     sigma = 0.0005
     a0=1/(sigma*np.sqrt(2*np.pi))
     
-    envals = np.linspace(np.min(band), np.min(band)+250/1000*0.0367493, 10000)
+    envals = np.linspace(np.min(band), np.min(band)+250/1000*0.0367493, 1000)
     
     #bandgaussian = gausiana(band,enval,sigma,a0)
     #mzeff = np.sum(mz*bandgaussian)/simps(bandgaussian)
@@ -140,7 +140,6 @@ def get_mzeffs(coefs, band, polyorder):
         bandgaussian = gausiana(band,enval2,sigma,a0)
         iderzvals.append(np.sum(derzvals*bandgaussian)/simps(bandgaussian))
         mzeffs.append(np.power(np.sum(derzvals*bandgaussian)/simps(bandgaussian),-1))
-    
     
     return mzeffs, envals, iderzvals, pol, enval, mz
 
@@ -169,7 +168,7 @@ if __name__ == '__main__':
     efermidopeda = 26.821041107177734/1000#50.916579365730286/1000
     
     efermidoped10b = 236.33401095867157/1000
-    efermidopedb = 50.916579365730286/1000
+    efermidopedb = 50.916579365730286/1000 
     
     band = ((dummy)[int(index[0])])*0.0367493 #hartree
     
@@ -179,7 +178,7 @@ if __name__ == '__main__':
     coefs *= scaling
     
     
-    '''Enlim = 0.4
+    '''Enlim = 0.5*0.0367493+zeroenergy*0.0367493
     trues = np.where(band<Enlim)
     coefs = coefs[trues[0]]
     band = band[trues[0]]'''
@@ -225,15 +224,18 @@ if __name__ == '__main__':
     fig2.set_size_inches(10, 6)
     
     ax5 = fig2.add_subplot(111)
-       
+
+   
+
     for polyorder in polyorders:
+        
         mzeffs, envals, derzvals, pol, enval, mz = get_mzeffs(coefs, band, polyorder)
         
         zero = zeroenergy#np.min(band/0.0367493)
         envals = envals/0.0367493-zero
         
-        ax1.plot(coefs, band)
-        ax1.plot(coefs, polyval(coefs,pol), label='C = {}'.format(polyorder))
+        ax1.plot(coefs, band/0.0367493-zero)
+        ax1.plot(coefs, polyval(coefs,pol)/0.0367493-zero, label='C = {}'.format(polyorder))
         
         
         ax2.plot(envals,derzvals, label='C = {}'.format(polyorder))
