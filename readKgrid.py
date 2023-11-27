@@ -134,21 +134,22 @@ def Kpath(path,n):
 
 
 if __name__ == '__main__':
-    qz = np.array([-13.01,0,7.48])
+    qz = np.array([-0.1495968000,0,0.1495966000])
     qz = qz
-    qy = np.array([0,0.5,0])
-    qx = np.array([0.5,0,0])#np.cross(qy,qz/np.linalg.norm(qz))
+    qy = np.array([0,1,0])
+    qx = np.array([0.1495968000,0,0.1495966000])#np.cross(qy,qz/np.linalg.norm(qz))
 
     npoints = 10
 
-    kpath = fromgridtoKPOINTS(qz,qy, [-0.10,0.10], [0,0], 1000,1)#np.array(Kpath([-qz, np.array([0.,0.,0.]), qz],npoints))
+    kpath = fromgridtoKPOINTS(qx,qz, [-1,1], [-1,1], 61,61)#np.array(Kpath([-qz, np.array([0.,0.,0.]), qz],npoints))
+    
     
     with open('Ag2Te\MBJ_thirdtry\IBZKPT') as f:
         ibzkpt = f.readlines()
     
     nkibz = int(ibzkpt[1])
     
-    with open('Ag2Te\\perpLineHighRezLong\\KPOINTS','w') as f:
+    with open('Ag2Te\\PGHR_XZ\\KPOINTS','w') as f:
         f.write('Kpoints generated automatically by F.B.\n')
         f.write('{}\n'.format(len(kpath)+nkibz))
         f.write('Reciprocal lattice\n')
@@ -156,7 +157,7 @@ if __name__ == '__main__':
             f.write(ibzkpt[i])
         for i in range(len(kpath)):
                 #f.write('{:.5f} {:.5f} {:.5f}\n'.format(kpath[i,0],kpath[i,1],kpath[i,2]))
-                f.write('{:.5f} {:.5f} {:.5f} {}\n'.format(kpath[i,0],kpath[i,1],kpath[i,2],'0.00'))
+                f.write('{:.7f} {:.7f} {:.7f} {}\n'.format(kpath[i,0],kpath[i,1],kpath[i,2],'0.00'))
     
     '''grid = fromgridtoKPOINTS(qx,qy,[-1,1],[-1,1],10,30)
 

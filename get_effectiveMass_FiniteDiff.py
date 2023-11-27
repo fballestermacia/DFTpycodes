@@ -6,34 +6,34 @@ from scipy.integrate import simps
 from numpy.polynomial.polynomial import polyder, polyval, polyfit
 from scipy.interpolate import griddata
 import scipy.constants as cte
+from get_effectiveMass import gausiana
 
-def directionalPolyFit(band,xs, ys, polyorder):
+def secondDer_FiniteDiff(fvals, xvals, boundary = 'closed'): #boundary = zero, closed
+    dervdummy = np.empty(len(fvals))
+    for i in range(1,len(fvals)-1):
+        num = fvals[i+1] - 2*fvals[i] + fvals[i-1]
+        den = (xvals[i+1]-xvals[i])*(xvals[i]-xvals[i-1])
+        dervdummy[i] = num/den
     
+    if boundary == 'zero':
+        dervdummy[0] = 0
+        dervdummy[-1] = 0
+    elif boundary == 'closed':
+        dervdummy[0] = dervdummy[1]
+        dervdummy[-1] = dervdummy[-2]
     
-    polyxs = []
-    polyys = []
-    for i in range(len(ys)):
-        polyxs.append(polyfit(xs,np.transpose(band)[i], polyorder))
-    for j in range(len(xs)):
-        polyys.append(polyfit(ys,band[j], polyorder)) 
-    
-    
-    
-    return polyxs, polyys
+    return dervdummy
 
 
-def gausiana(x,center,sigma):
-    a0 = 1/(sigma*np.sqrt(2*np.pi))
-    return a0*np.exp(-(np.power(x-center,2))/(2*sigma**2))
 
 if __name__ == '__main__':
     #CONSTANTS
     eV2Hartree = 1/27.2113845#0.0367493
-    polyorder = 8
-    sigx = 0.0003
+    sigx = 0.0005
     sigy = 1*sigx
     #########
 
+    
 
     qz = np.array([-13.01,0,7.48])
     qz = qz/np.linalg.norm(qz)
@@ -58,20 +58,30 @@ if __name__ == '__main__':
 
     xs, ylen = np.unique(qxvals, return_counts=True) 
     ys, xlen = np.unique(qyvals, return_counts=True)
-    
+    #xs_reduced, ys_reduced = xs[1:-1], ys[1:-1]
 
     shape = [ylen[0], xlen[0]]
 
     band2 = band.reshape(shape[::-1])
-    polyxs, polyys = directionalPolyFit(band2,xs, ys, polyorder)
-
-    derx = polyder(polyxs,2, axis=1)
-    dery = polyder(polyys,2, axis=1)
-
-    derxvals = polyval(xs, np.transpose(derx), tensor=True)
-    deryvals = polyval(ys, np.transpose(dery), tensor=True)
     
+    for xband in np.transpose(band2):
+        dummyder = secondDer_FiniteDiff(xband, xs)
+        try:
+            derxvals=np.vstack([derxvals,np.array(dummyder)])
+        except NameError:
+            derxvals=np.array(dummyder)
+
     
+    for yband in band2:
+        dummyder = secondDer_FiniteDiff(yband, xs)
+        try:
+            deryvals=np.vstack([deryvals,np.array(dummyder)])
+        except NameError:
+            deryvals=np.array(dummyder)
+
+
+    #print(derxvals)
+
     efermi_no10times = 42/1000 # meVs, fermi energi with previous doping
     efermi = 196/1000 # meVs, fermi energi with 10 times the doping
     envals = np.linspace(np.min(band2), np.min(band2)+0.25*eV2Hartree, 200)
@@ -231,7 +241,7 @@ if __name__ == '__main__':
     ##########################################
 
     nlev = 10
-    norm = mpl.colors.Normalize(vmin=np.min(0), vmax= np.max(1))
+    norm = mpl.colors.Normalize(vmin=np.min(0), vmax= np.max(10))
     levelsm = np.linspace(0,1, nlev)
 
     fig = plt.figure()
@@ -252,7 +262,7 @@ if __name__ == '__main__':
     ax.set_title('$m_z$')
     ##########################################
 
-    norm = mpl.colors.Normalize(vmin=np.min(0), vmax= np.max(1))
+    norm = mpl.colors.Normalize(vmin=np.min(0), vmax= np.max(5))
     levelsm = np.linspace(0,1, nlev)
 
     fig = plt.figure()
