@@ -48,9 +48,11 @@ if __name__ == '__main__':
     '''qz = np.array([-0.1495968000,0,0.1495966000])
     qy = np.array([0,1,0])
     qx = np.array([0.1495966000,0,0.1495968000])
+    '''
 
     qz /= np.linalg.norm(qz)
-    qx /= np.linalg.norm(qx)'''
+    qy /= np.linalg.norm(qy)
+    qx /= np.linalg.norm(qx)
 
     bands, efermi, qxvals, qyvals, qzvals, occupation = fromOUTCARtoplot(outcarfile='Ag2Te\\PGHR_DENSER\\OUTCAR',kpointsfile="Ag2Te\\PGHR_DENSER\\KPOINTS",
                                                                           qx=qz, qy=qy, qz=qx, weightfilter = 0)
