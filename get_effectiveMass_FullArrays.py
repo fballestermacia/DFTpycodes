@@ -7,10 +7,12 @@ from numpy.polynomial.polynomial import polyder, polyval, polyfit
 from scipy.interpolate import griddata
 import scipy.constants as cte
 
-def directionalPolyFit(band,xs, ys, polyorder):
-
+def directionalPolyFitFULLARRAY(band,xs, ys, polyorder):
+    
+    
     polyxs = polyfit(xs,band, polyorder)
     polyys = polyfit(ys,np.transpose(band), polyorder)
+    
     return polyxs, polyys
 
 
@@ -22,7 +24,7 @@ if __name__ == '__main__':
     #CONSTANTS
     eV2Hartree = 1/27.2113845#0.0367493
     polyorder = 10
-    sigx = 0.0002
+    sigx = 0.0003
     sigy = 1*sigx
     alat=15.25
     #########
@@ -46,8 +48,8 @@ if __name__ == '__main__':
     qx *= 1/np.linalg.norm(qx)
     qy *= 1/np.linalg.norm(qy)
 
-    bands, efermi, qxvals, qyvals, qzvals, occupation = fromOUTCARtoplot(outcarfile='Ag2Te\\PGHR4\\OUTCAR',kpointsfile="Ag2Te\\PGHR4\\KPOINTS", qx=qz, qy=qy, qz=qx, weightfilter = 0)
-    
+    bands, efermi, qxvals, qyvals, qzvals, occupation = fromOUTCARtoplot(outcarfile='Ag2Te\\PGHR_XZ\\OUTCAR',kpointsfile="Ag2Te\\PGHR_XZ\\KPOINTS", qx=qx, qy=qz, qz=qy, weightfilter = 0)
+
     dummy = np.transpose(bands[0])
     dummyoc = np.transpose(occupation[0])
 
@@ -55,24 +57,29 @@ if __name__ == '__main__':
 
     band = ((dummy)[int(index[0])])
     band = (band-np.min(band))*eV2Hartree
-
-    
     
 
-    xs, ylen = np.unique(qxvals, return_counts=True) 
-    ys, xlen = np.unique(qyvals, return_counts=True)
+    shape = [51, 71]
 
-    shape = [ylen[0], xlen[0]]
+    NX = np.linspace(-0.20, 0.20, 61)
+    NY = np.linspace(-0.20, 0.20, 61)
+    
+    QX, QY = np.meshgrid(NX,NY)
+    
+    KX = np.outer(QX.flatten(),qx)
+    KY = np.outer(QY.flatten(),qy)
+
+    xs = NX
+    ys = NY
 
     band2 = band.reshape(shape[::-1])
-    polyxs, polyys = directionalPolyFit(band2,xs, ys, polyorder)
+    polyxs, polyys = directionalPolyFitFULLARRAY(band2,xs, ys, polyorder)
 
     derx = polyder(polyxs,2, axis=0)
     dery = polyder(polyys,2, axis=0)
 
     derxvals = polyval(xs, derx, tensor=True)
     deryvals = polyval(ys, dery, tensor=True)
-
     
     efermi_no10times = 42/1000 # meVs, fermi energi with previous doping
     efermi = 196/1000 # meVs, fermi energi with 10 times the doping
@@ -84,9 +91,14 @@ if __name__ == '__main__':
 
     X,Y = np.meshgrid(xx,yy)
 
-    gridddx = griddata(np.transpose([qxvals,qyvals]),np.transpose(derxvals).flatten(),(X,Y), method='linear')
+    '''gridddx = griddata(np.transpose([qxvals,qyvals]),np.transpose(derxvals).flatten(),(X,Y), method='linear')
     gridddy = griddata(np.transpose([qxvals,qyvals]),deryvals.flatten(),(X,Y), method='linear')
-    gridE = griddata(np.transpose([qxvals,qyvals]),band2.flatten(),(X,Y), method='linear')
+    gridE = griddata(np.transpose([qxvals,qyvals]),band2.flatten(),(X,Y), method='linear')'''
+
+    gridddx = np.transpose(derxvals)
+    gridddy = deryvals
+    gridE = band2
+
 
     for en in envals:
         #Cicle through all data in the grid
@@ -141,8 +153,8 @@ if __name__ == '__main__':
     myeffs = ddyvals**-1*factor
 
     plt.figure()
-    plt.plot(ens, mxeffs, label='$m_{z, eff}$')
-    plt.plot(ens, myeffs, label='$m_{y, eff}$')
+    plt.plot(ens, mxeffs, label='$m_{x, eff}$')
+    plt.plot(ens, myeffs, label='$m_{z, eff}$')
     plt.vlines(efermi*1000, 0, np.max(mxeffs), 'r', label = '$E_f(10\\cdot n)$')
     plt.vlines(efermi_no10times*1000, 0, np.max(mxeffs), 'k', '--', label = '$E_f(n)$')
     plt.xlabel('$E$ (meV)')
@@ -154,7 +166,7 @@ if __name__ == '__main__':
     plt.vlines(efermi*1000, 0, np.max(np.array(mxeffs)/np.array(myeffs)), 'r')
     plt.vlines(efermi_no10times*1000, 0, np.max(np.array(mxeffs)/np.array(myeffs)), 'k', '--')
     plt.xlabel('$E$ (meV)')
-    plt.ylabel('$m_z/m_y$')
+    plt.ylabel('$m_x/m_z$')
     plt.vlines(efermi*1000, 0, np.max(mxeffs), 'r', label = '$E_f(10\\cdot n)$')
     plt.vlines(efermi_no10times*1000, 0, np.max(mxeffs), 'k', '--', label = '$E_f(n)$')
     plt.legend()
@@ -187,9 +199,9 @@ if __name__ == '__main__':
     fermilevel = ax1.contour(X,Y,np.transpose(band2), [enval_no10times], colors='b', zorder=10)
     fermilevel = ax1.contour(X,Y,np.transpose(band2), [enval], colors='r', zorder=10)
     
-    ax1.set_xlabel('$q_z$')
-    ax1.set_ylabel('$q_y$')
-    ax1.set_title('$E(q_z,q_y)$')
+    ax1.set_xlabel('$q_x$')
+    ax1.set_ylabel('$q_z$')
+    ax1.set_title('$E(q_x,q_z)$')
 
     ##########################################
     nlev = 30
@@ -208,9 +220,9 @@ if __name__ == '__main__':
 
     fermilevel = ax2.contour(X,Y,np.transpose(band2), [enval_no10times], colors='b', zorder=10)
     fermilevel = ax2.contour(X,Y,np.transpose(band2), [enval], colors='r', zorder=10)
-    ax2.set_xlabel('$q_z$')
-    ax2.set_ylabel('$q_y$')
-    ax2.set_title('$\\frac{\\partial^2 E}{\\partial q_z ^2}$')
+    ax2.set_xlabel('$q_x$')
+    ax2.set_ylabel('$q_z$')
+    ax2.set_title('$\\frac{\\partial^2 E}{\\partial q_x ^2}$')
     
     ##########################################
     #   BE EXTREMELY CAREFUL THERE'S A BUG THAT CHANGES THE NEXT PLOT
@@ -231,9 +243,9 @@ if __name__ == '__main__':
 
     fermilevel = ax3.contour(X,Y,np.transpose(band2), [enval_no10times], colors='b', zorder=10)
     fermilevel = ax3.contour(X,Y,np.transpose(band2), [enval], colors='r', zorder=10)
-    ax3.set_xlabel('$q_z$')
-    ax3.set_ylabel('$q_y$')
-    ax3.set_title('$\\frac{\\partial^2 E}{\\partial q_y ^2}$')
+    ax3.set_xlabel('$q_x$')
+    ax3.set_ylabel('$q_z$')
+    ax3.set_title('$\\frac{\\partial^2 E}{\\partial q_z ^2}$')
     
     ##########################################
     
@@ -255,9 +267,9 @@ if __name__ == '__main__':
 
     fermilevel = ax4.contour(X,Y,np.transpose(band2), [enval_no10times], colors='b', zorder=10)
     fermilevel = ax4.contour(X,Y,np.transpose(band2), [enval], colors='r', zorder=10)
-    ax4.set_xlabel('$q_z$')
-    ax4.set_ylabel('$q_y$')
-    ax4.set_title('$m_z$')
+    ax4.set_xlabel('$q_x$')
+    ax4.set_ylabel('$q_z$')
+    ax4.set_title('$m_x$')
 
     ##########################################
     #   BE EXTREMELY CAREFUL THERE'S A BUG THAT CHANGES THE NEXT PLOT
@@ -280,7 +292,7 @@ if __name__ == '__main__':
 
     fermilevel = ax5.contour(X,Y,np.transpose(band2), [enval_no10times], colors='b', zorder=10)
     fermilevel = ax5.contour(X,Y,np.transpose(band2), [enval], colors='r', zorder=10)
-    ax5.set_xlabel('$q_z$')
-    ax5.set_ylabel('$q_y$')
-    ax5.set_title('$m_y$')
+    ax5.set_xlabel('$q_x$')
+    ax5.set_ylabel('$q_z$')
+    ax5.set_title('$m_z$')
     plt.show()

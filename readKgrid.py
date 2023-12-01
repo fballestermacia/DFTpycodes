@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def fromKPOINTStogrid(kpointsfile='KPOINTS', qx = np.array([1,0,0]), qy = np.array([0,1,0]), weightfilter = None):
+def fromKPOINTStogrid(kpointsfile='KPOINTS', qx = np.array([1,0,0]), qy = np.array([0,1,0]), qz = np.array([0,0,1]), weightfilter = None):
     
     kp = open(kpointsfile).readlines()
     
@@ -15,7 +15,8 @@ def fromKPOINTStogrid(kpointsfile='KPOINTS', qx = np.array([1,0,0]), qy = np.arr
     
     qxvals = []
     qyvals = []
-    
+    qzvals = []
+
     if weightfilter is not None:
         readornot = []
     else:
@@ -32,17 +33,20 @@ def fromKPOINTStogrid(kpointsfile='KPOINTS', qx = np.array([1,0,0]), qy = np.arr
             
         kvalx, kvaly, kvalz = [float(x) for x in kp[i].strip().split()[:3]]
         
-        if not RECLAT:
+        if RECLAT:
             coefx = np.dot(np.array([kvalx,kvaly,kvalz]),qx)/np.linalg.norm(qx)**2
             coefy = np.dot(np.array([kvalx,kvaly,kvalz]),qy)/np.linalg.norm(qy)**2
+            coefz = np.dot(np.array([kvalx,kvaly,kvalz]),qz)/np.linalg.norm(qz)**2
         else: 
             coefx = kvalx
             coefy = kvaly
+            coefz = kvalz
         
         qxvals.append(coefx)
         qyvals.append(coefy)
+        qzvals.append(coefz)
     
-    return np.array(qxvals), np.array(qyvals), readornot
+    return np.array(qxvals), np.array(qyvals), np.array(qzvals), readornot
 
 
 def fromgridtoKPOINTS(qx, qy, qxlims, qylims, nxpoints, nypoints, origin = np.array([0,0,0])):
@@ -59,9 +63,9 @@ def fromgridtoKPOINTS(qx, qy, qxlims, qylims, nxpoints, nypoints, origin = np.ar
     return KGRID
 
 
-def fromOUTCARtoplot(outcarfile = 'OUTCAR', kpointsfile = 'KPOINTS', qx = np.array([1,0,0]), qy = np.array([0,1,0]), weightfilter = None):
+def fromOUTCARtoplot(outcarfile = 'OUTCAR', kpointsfile = 'KPOINTS', qx = np.array([1,0,0]), qy = np.array([0,1,0]), qz = np.array([0,0,1]), weightfilter = None):
     
-    qxvals, qyvals, readornot = fromKPOINTStogrid(kpointsfile=kpointsfile, qx = qx, qy = qy, weightfilter=weightfilter)
+    qxvals, qyvals, qzvals, readornot = fromKPOINTStogrid(kpointsfile=kpointsfile, qx = qx, qy = qy, qz=qz, weightfilter=weightfilter)
     
     # Separate outcar file in lines and remove trailing and heading whitespaces
     outcar = [line for line in open(outcarfile) if line.strip()] 
@@ -118,7 +122,7 @@ def fromOUTCARtoplot(outcarfile = 'OUTCAR', kpointsfile = 'KPOINTS', qx = np.arr
     bands = np.array(bands, dtype=float).reshape((ispin, nkpts, nband)) 
     occupation = np.array(occupation, dtype=float).reshape((ispin, nkpts, nband)) 
        
-    return bands, efermi, qxvals, qyvals, occupation
+    return bands, efermi, qxvals, qyvals, qzvals, occupation
 
 
 def Kpath(path,n):
@@ -134,14 +138,21 @@ def Kpath(path,n):
 
 
 if __name__ == '__main__':
-    qz = np.array([-0.1495968000,0,0.1495966000])
-    qz = qz
-    qy = np.array([0,1,0])
-    qx = np.array([0.1495968000,0,0.1495966000])#np.cross(qy,qz/np.linalg.norm(qz))
+    qz = np.array([-13.01,0,7.48])
+    #qz = np.array([-0.1495968, 0., 0.1495966])
+    qz = qz/np.linalg.norm(qz)
+
+    qy = np.array([0,1.,0])
+
+    qx = np.cross(qy, qz)#np.cross(qy,qz/np.linalg.norm(qz))
+
+    qz *= 1/np.linalg.norm(qz)
+    qx *= 1/np.linalg.norm(qx)
+    qy *= 1/np.linalg.norm(qy)
 
     npoints = 10
 
-    kpath = fromgridtoKPOINTS(qx,qz, [-1,1], [-1,1], 61,61)#np.array(Kpath([-qz, np.array([0.,0.,0.]), qz],npoints))
+    kpath = fromgridtoKPOINTS(qx,qz, [-0.2,0.2], [-0.2,0.2], 51,71)#np.array(Kpath([-qz, np.array([0.,0.,0.]), qz],npoints))
     
     
     with open('Ag2Te\MBJ_thirdtry\IBZKPT') as f:
@@ -157,7 +168,7 @@ if __name__ == '__main__':
             f.write(ibzkpt[i])
         for i in range(len(kpath)):
                 #f.write('{:.5f} {:.5f} {:.5f}\n'.format(kpath[i,0],kpath[i,1],kpath[i,2]))
-                f.write('{:.7f} {:.7f} {:.7f} {}\n'.format(kpath[i,0],kpath[i,1],kpath[i,2],'0.00'))
+                f.write('{:.14f} {:.14f} {:.14f} {}\n'.format(kpath[i,0],kpath[i,1],kpath[i,2],'0.00'))
     
     '''grid = fromgridtoKPOINTS(qx,qy,[-1,1],[-1,1],10,30)
 

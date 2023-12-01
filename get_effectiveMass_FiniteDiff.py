@@ -9,12 +9,14 @@ import scipy.constants as cte
 from get_effectiveMass import gausiana
 
 def secondDer_FiniteDiff(fvals, xvals, boundary = 'closed'): #boundary = zero, closed
+
     dervdummy = np.empty(len(fvals))
-    for i in range(1,len(fvals)-1):
-        num = fvals[i+1] - 2*fvals[i] + fvals[i-1]
-        den = (xvals[i+1]-xvals[i])*(xvals[i]-xvals[i-1])
-        dervdummy[i] = num/den
-    
+
+    num = fvals[2:] - 2*fvals[1:-1] + fvals[:-2]
+    den = (xvals[2:] - xvals[1:-1])*(xvals[1:-1]-xvals[:-2])
+
+    dervdummy[1:-1] = num/den
+
     if boundary == 'zero':
         dervdummy[0] = 0
         dervdummy[-1] = 0
@@ -29,21 +31,29 @@ def secondDer_FiniteDiff(fvals, xvals, boundary = 'closed'): #boundary = zero, c
 if __name__ == '__main__':
     #CONSTANTS
     eV2Hartree = 1/27.2113845#0.0367493
-    sigx = 0.0005
-    sigy = 1*sigx
+    sigx = 0.0001
+    sigy = sigx
     #########
 
     
 
     qz = np.array([-13.01,0,7.48])
     qz = qz/np.linalg.norm(qz)
+    
 
     qy = np.array([0,1,0])
 
     qx = np.cross(qy, qz)
-    qx[0] *=-1
 
-    bands, efermi, qxvals, qyvals, occupation = fromOUTCARtoplot(outcarfile='Ag2Te\\PGHR4\\OUTCAR',kpointsfile="Ag2Te\\PGHR4\\KPOINTS", qx=qx, qy=qy, weightfilter = 0)
+    '''qz = np.array([-0.1495968000,0,0.1495966000])
+    qy = np.array([0,1,0])
+    qx = np.array([0.1495966000,0,0.1495968000])
+
+    qz /= np.linalg.norm(qz)
+    qx /= np.linalg.norm(qx)'''
+
+    bands, efermi, qxvals, qyvals, qzvals, occupation = fromOUTCARtoplot(outcarfile='Ag2Te\\PGHR_DENSER\\OUTCAR',kpointsfile="Ag2Te\\PGHR_DENSER\\KPOINTS",
+                                                                          qx=qz, qy=qy, qz=qx, weightfilter = 0)
     
     dummy = np.transpose(bands[0])
     dummyoc = np.transpose(occupation[0])
@@ -54,11 +64,12 @@ if __name__ == '__main__':
     band = (band-np.min(band))*eV2Hartree
 
     
-    
+    #qyvals = qzvals
 
+    
     xs, ylen = np.unique(qxvals, return_counts=True) 
     ys, xlen = np.unique(qyvals, return_counts=True)
-    #xs_reduced, ys_reduced = xs[1:-1], ys[1:-1]
+    
 
     shape = [ylen[0], xlen[0]]
 
@@ -73,7 +84,7 @@ if __name__ == '__main__':
 
     
     for yband in band2:
-        dummyder = secondDer_FiniteDiff(yband, xs)
+        dummyder = secondDer_FiniteDiff(yband, ys)
         try:
             deryvals=np.vstack([deryvals,np.array(dummyder)])
         except NameError:
@@ -170,8 +181,8 @@ if __name__ == '__main__':
 
     band2 = band2/eV2Hartree*1000
 
-    enval=efermi*eV2Hartree
-    enval_no10times = efermi_no10times*eV2Hartree
+    enval=efermi*1000
+    enval_no10times = efermi_no10times*1000
     cmap = mpl.cm.viridis
     
 
@@ -192,8 +203,8 @@ if __name__ == '__main__':
     ax.scatter(0,0,s=10,c='r',marker='x', label = '$\\Gamma$')
     plt.legend()
 
-    fermilevel = ax.tricontour(qxvals, qyvals, band, [enval_no10times], colors='b', zorder=10)
-    fermilevel = ax.tricontour(qxvals, qyvals, band, [enval], colors='r', zorder=10)
+    fermilevel = ax.contour(X,Y,np.transpose(band2), [enval_no10times], colors='b', zorder=10)
+    fermilevel = ax.contour(X,Y,np.transpose(band2), [enval], colors='r', zorder=10)
     
     ax.set_xlabel('$q_z$')
     ax.set_ylabel('$q_y$')
@@ -214,8 +225,8 @@ if __name__ == '__main__':
     ax.scatter(0,0,s=10,c='r',marker='x', label = '$\\Gamma$')
     plt.legend()
 
-    fermilevel = ax.tricontour(qxvals, qyvals, band, [enval_no10times], colors='b', zorder=10)
-    fermilevel = ax.tricontour(qxvals, qyvals, band, [enval], colors='r', zorder=10)
+    fermilevel = ax.contour(X,Y,np.transpose(band2), [enval_no10times], colors='b', zorder=10)
+    fermilevel = ax.contour(X,Y,np.transpose(band2), [enval], colors='r', zorder=10)
     ax.set_xlabel('$q_z$')
     ax.set_ylabel('$q_y$')
     ax.set_title('$\\frac{\\partial^2 E}{\\partial q_z ^2}$')
@@ -233,8 +244,8 @@ if __name__ == '__main__':
     ax.scatter(0,0,s=10,c='r',marker='x', label = '$\\Gamma$')
     plt.legend()
 
-    fermilevel = ax.tricontour(qxvals, qyvals, band, [enval_no10times], colors='b', zorder=10)
-    fermilevel = ax.tricontour(qxvals, qyvals, band, [enval], colors='r', zorder=10)
+    fermilevel = ax.contour(X,Y,np.transpose(band2), [enval_no10times], colors='b', zorder=10)
+    fermilevel = ax.contour(X,Y,np.transpose(band2), [enval], colors='r', zorder=10)
     ax.set_xlabel('$q_z$')
     ax.set_ylabel('$q_y$')
     ax.set_title('$\\frac{\\partial^2 E}{\\partial q_y ^2}$')
@@ -255,8 +266,8 @@ if __name__ == '__main__':
     ax.scatter(0,0,s=10,c='r',marker='x', label = '$\\Gamma$')
     plt.legend()
 
-    fermilevel = ax.tricontour(qxvals, qyvals, band, [enval_no10times], colors='b', zorder=10)
-    fermilevel = ax.tricontour(qxvals, qyvals, band, [enval], colors='r', zorder=10)
+    fermilevel = ax.contour(X,Y,np.transpose(band2), [enval_no10times], colors='b', zorder=10)
+    fermilevel = ax.contour(X,Y,np.transpose(band2), [enval], colors='r', zorder=10)
     ax.set_xlabel('$q_z$')
     ax.set_ylabel('$q_y$')
     ax.set_title('$m_z$')
@@ -276,8 +287,8 @@ if __name__ == '__main__':
     ax.scatter(0,0,s=10,c='r',marker='x', label = '$\\Gamma$')
     plt.legend()
 
-    fermilevel = ax.tricontour(qxvals, qyvals, band, [enval_no10times], colors='b', zorder=10)
-    fermilevel = ax.tricontour(qxvals, qyvals, band, [enval], colors='r', zorder=10)
+    fermilevel = ax.contour(X,Y,np.transpose(band2), [enval_no10times], colors='b', zorder=10)
+    fermilevel = ax.contour(X,Y,np.transpose(band2), [enval], colors='r', zorder=10)
     ax.set_xlabel('$q_z$')
     ax.set_ylabel('$q_y$')
     ax.set_title('$m_y$')

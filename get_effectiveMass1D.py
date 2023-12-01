@@ -4,6 +4,7 @@ from scipy.integrate import simps
 from scipy.interpolate import splev, splrep
 from numpy.polynomial.polynomial import polyder, polyval, polyfit
 
+
 def fromKPOINTStoline(kpointsfile='KPOINTS', vec=np.array([0.5,0.,0.]), weightfilter = None):
     
     kp = open(kpointsfile).readlines()
