@@ -1,56 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
-
-def readPhononbandFreq(freqgpfile): #freqgpfile=SYSTEM.freq.gp
-
-    data = np.loadtxt(freqgpfile)
-
-    nbands = data.shape[1] - 1
-    qpoints = data[:, 0]
-    bands = np.transpose(data)[1:,]
-
-    return qpoints, bands
-
-
-def readHighSymPointsPhonon(matdynfile):  #matdynfile=matdyn.in
-    filelines = [line for line in open(matdynfile) if line.strip()]
-    qbandform=False
-    for i,fline in enumerate(filelines):
-        
-        if fline.split()[0]=='readtau' and fline.split()[-1]=='.true.':
-            continue #TODO: INCLUDE THE CASE WHERE ATOMIC POSITIONS ARE READ
-
-        if fline.split()[0]=='q_in_band_form' and fline.split()[-1]=='.true.':
-            qbandform=True
-
-        if fline.split()[0]=='/':
-            if qbandform:
-                start = i+1
-
-            #TODO: make the case where qbandform=False
-    
-    npoints = int(filelines[start])
-    labels = []
-    positions = np.empty(npoints, dtype='int')
-    counter = 0
-    for i,kline in enumerate(filelines[start+1:]):
-        dummylabel = str(kline.split('!')[-1].split()[0])
-        if dummylabel[0].upper() == 'G':
-            labels.append('$\\Gamma$')  
-        else: labels.append('${}$'.format(dummylabel))
-        positions[i] = counter
-        counter += int(kline.split()[-2])
-    return labels, positions
+import utilsQE
 
 
 
+qpoints, bands = utilsQE.readPhononbandFreq("AgP2\phonons\AgP2.freq.gp")
 
-
-
-qpoints, bands = readPhononbandFreq("AgP2\phonons\AgP2.freq.gp")
-
-qlabels, positions = readHighSymPointsPhonon("AgP2\phonons\matdyn_AgP2.in")
+qlabels, positions = utilsQE.readHighSymPointsPhonon("AgP2\phonons\matdyn_AgP2.in")
 
 plt.figure()
 

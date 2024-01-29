@@ -1,34 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import CubicSpline
-
-def fromDOSCARtoarray(doscarfile = 'DOSCAR'):
-    dfile = open(doscarfile).readlines()
-    
-    initTemp = float(dfile[2].strip())
-    
-    infoline = [float(x) for x in dfile[5].strip().split()]
-    
-    #NEDOS is not always present, if not, it will be equal to Efermi.
-    Emax, Emin, Erange, NEDOS, Efermi = infoline[0], infoline[1], infoline[2], infoline[3], infoline[-2] 
-    
-    Energy = []
-    DOS = []
-    iDOS = []
-    
-    
-    for line in dfile[6:]:
-        dummy = [float(x) for x in line.strip().split()]
-        dummyEnergy, dummyDOS, dummyiDOS = dummy
-        Energy.append(dummyEnergy)
-        DOS.append(dummyDOS)
-        iDOS.append(dummyiDOS)
-    
-    return np.array(Energy), np.array(DOS), np.array(iDOS), Emax, Emin, Erange, NEDOS, Efermi
+import utilsVASP
  
  
 if __name__ == '__main__':       
-    Energy, DOS, iDOS, Emax, Emin, Erange, NEDOS, Efermi = fromDOSCARtoarray( doscarfile='Ag2Te\MBJ_thirdtry\DOSCAR')
+    Energy, DOS, iDOS, Emax, Emin, Erange, NEDOS, Efermi = utilsVASP.fromDOSCARtoarray( doscarfile='Ag2Te\MBJ_thirdtry\DOSCAR')
 
 
     #carrier concentration n = 1.65·10^18 cm-3

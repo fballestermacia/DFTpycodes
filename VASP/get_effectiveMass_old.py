@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from readKgrid import fromOUTCARtoplot
+from utilsVASP import fromOUTCARtoplot
 from scipy.integrate import simps
 from numpy.polynomial.polynomial import polyder, polyval, polyfit
 

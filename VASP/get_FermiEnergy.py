@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from readDOSCAR import fromDOSCARtoarray
+from utilsVASP import fromDOSCARtoarray
 import scipy.constants as cte
 from scipy.integrate import simps, quad
 from scipy.interpolate import CubicSpline, PPoly

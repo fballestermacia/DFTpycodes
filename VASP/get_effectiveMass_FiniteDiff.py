@@ -1,12 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-from readKgrid import fromOUTCARtoplot
 from scipy.integrate import simps
 from numpy.polynomial.polynomial import polyder, polyval, polyfit
 from scipy.interpolate import griddata
 import scipy.constants as cte
-from get_effectiveMass import gausiana
+from utilsVASP import fromOUTCARtoplot
 
 def secondDer_FiniteDiff(fvals, xvals, boundary = 'closed'): #boundary = zero, closed
 
@@ -26,6 +25,9 @@ def secondDer_FiniteDiff(fvals, xvals, boundary = 'closed'): #boundary = zero, c
     
     return dervdummy
 
+def gausiana(x,center,sigma):
+    a0 = 1/(sigma*np.sqrt(2*np.pi))
+    return a0*np.exp(-(np.power(x-center,2))/(2*sigma**2))
 
 
 if __name__ == '__main__':

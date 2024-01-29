@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-from readKgrid import fromOUTCARtoplot
+from utilsVASP import fromOUTCARtoplot
 from scipy.integrate import simps
 from numpy.polynomial.polynomial import polyder, polyval, polyfit
 from scipy.interpolate import griddata
