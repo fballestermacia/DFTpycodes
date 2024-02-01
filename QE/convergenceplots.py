@@ -82,7 +82,8 @@ def dataforeachKgrid(data):
     Returns the data split in two arrays, one for the kgrids and one with the rest of the data ordered in the same way as the kgrids.
     """
 
-    kgrids = np.unique(data[:,0])
+    kgrids, indexes = np.unique(data[:,0], return_index=True)
+    kgrids = kgrids[indexes.argsort()]
     
     data4kgrid = []
     for kgrid in kgrids:

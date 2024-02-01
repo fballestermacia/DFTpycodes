@@ -4,9 +4,9 @@ import utilsQE
 
 
 
-qpoints, bands = utilsQE.readPhononbandFreq("AgP2\phonons\AgP2.freq.gp")
+qpoints, bands = utilsQE.readPhononbandFreq(r"AgP2\phonons\AgP2.freq.gp")
 
-qlabels, positions = utilsQE.readHighSymPointsPhonon("AgP2\phonons\matdyn_AgP2.in")
+qlabels, positions = utilsQE.readHighSymPointsPhonon(r"AgP2\phonons\matdyn_AgP2.in")
 
 plt.figure()
 
@@ -15,7 +15,7 @@ for band in bands:
 
 for pos in positions:
     plt.axvline(x=qpoints[pos], linewidth=0.5, color='k')
-print(qlabels)
+
 plt.xticks(ticks=qpoints[positions[:]], labels=qlabels)
 
 plt.axhline(y=0, linewidth=0.5, color='b', linestyle='--')
