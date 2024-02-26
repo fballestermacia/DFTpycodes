@@ -101,7 +101,7 @@ def dataforeachKgrid(data):
 
 if __name__ == '__main__':
 #[GRID, CUTOFF, TOTAL ENERGY PER ATOM (in meV), FERMI ENERGY (in eV), TOTAL RUNTIME (in hours), TOTAL RAM (in Gb), TOTAL FORCES PER ATOM (in meV)]
-    data = readfolder(r'AgP2\ConvergenceTest')
+    data = readfolder(r'AgP2\ConvergenceTest\data')
     kgrids, data4kgrid = dataforeachKgrid(data)
     
 
