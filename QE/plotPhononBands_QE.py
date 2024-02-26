@@ -4,9 +4,9 @@ import utilsQE
 
 
 
-qpoints, bands = utilsQE.readPhononbandFreq(r"AgP2\phonons\AgP2.freq.gp")
+qpoints, bands = utilsQE.readPhononbandFreq(r"AgP2\Phonons_V2\AgP2.freq.gp")
 
-qlabels, positions = utilsQE.readHighSymPointsPhonon(r"AgP2\phonons\matdyn_AgP2.in")
+qlabels, positions = utilsQE.readHighSymPointsPhonon(r"AgP2\Phonons_V2\matdyn_AgP2.in")
 
 plt.figure()
 

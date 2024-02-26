@@ -95,7 +95,7 @@ def readPhononbandFreq(freqgpfile): #freqgpfile=SYSTEM.freq.gp
     return qpoints, bands
 
 
-def readHighSymPointsPhonon(matdynfile):  #matdynfile=matdyn.in
+def readHighSymPointsPhonon(matdynfile, retKpoints=False):  #matdynfile=matdyn.in
     filelines = [line for line in open(matdynfile) if line.strip()]
     qbandform=False
     for i,fline in enumerate(filelines):
@@ -103,7 +103,7 @@ def readHighSymPointsPhonon(matdynfile):  #matdynfile=matdyn.in
         if fline.split()[0]=='readtau' and fline.split()[-1]=='.true.':
             continue #TODO: INCLUDE THE CASE WHERE ATOMIC POSITIONS ARE READ
 
-        if fline.split()[0]=='q_in_band_form' and fline.split()[-1]=='.true.':
+        if fline.split()[0]=='q_in_band_form' and (fline.split()[-1]=='.true.'or fline.split()[-1]=='.true.,'):
             qbandform=True
 
         if fline.split()[0]=='/':
@@ -114,15 +114,23 @@ def readHighSymPointsPhonon(matdynfile):  #matdynfile=matdyn.in
     
     npoints = int(filelines[start])
     labels = []
+    if retKpoints: HSpoints = []
     positions = np.empty(npoints, dtype='int')
     counter = 0
     for i,kline in enumerate(filelines[start+1:]):
         dummylabel = str(kline.split('!')[-1].split()[0])
+        if retKpoints:
+            HSpoints.append([float(kline.split()[0]),float(kline.split()[1]),float(kline.split()[2])])
+            
         if dummylabel[0].upper() == 'G':
             labels.append('$\\Gamma$')  
         else: labels.append('${}$'.format(dummylabel))
         positions[i] = counter
         counter += int(kline.split()[-2])
+    
+    if retKpoints:
+        return labels, positions, HSpoints
+    
     return labels, positions
 
 
@@ -255,7 +263,57 @@ def orderedKgrid(kgrids):
     return outgrid
 
 
+def readcellvec(scffile):
+    """
+    Returns an array of vectors for the crystal and reciprocal axes of QE
+    """
+    cryst = []
+    rec = []
+    filelines = [line for line in open(scffile) if line.strip]
+    for line in filelines:
+        try:
+            line.split()[0]
+        except IndexError:
+            continue
+        if line.split()[0] == 'a(1)' or line.split()[0] == 'a(2)' or line.split()[0] == 'a(3)':
+            cryst.append([float(line.split()[3]),float(line.split()[4]),float(line.split()[5])])
+        if line.split()[0] == 'b(1)' or line.split()[0] == 'b(2)' or line.split()[0] == 'b(3)':
+            rec.append([float(line.split()[3]),float(line.split()[4]),float(line.split()[5])])
+    return np.array(cryst), np.array(rec)
 
-
-#TODO: Utils for reading Grids and cutoff energies from folder names 
-#also make different functios for reading different things from files
+def readModesatKpoin(kpointvec, modesfile='matdyn.modes',scffile='scf.out'):
+    """
+    Returns an array of vector modes from the matdyn.modes file of QE at a given k-point
+    """
+    cryst,rec = readcellvec(scffile)
+    
+    kpoint = np.round(kpointvec[0]*rec[0]+kpointvec[1]*rec[1]+kpointvec[2]*rec[2],4)
+    filelines = [line for line in open(modesfile) if line.strip]
+    inmodes = False
+    First = True
+    modes = []
+    for line in filelines:
+        if not inmodes:
+            
+            try:
+                if line.split()[0] == 'q':
+                    if float(line.split()[2]) == kpoint[0] and float(line.split()[3]) == kpoint[1] and float(line.split()[4]) == kpoint[2]:
+                        inmodes = True   
+            except IndexError:
+                continue         
+        else:
+            if line.split()[0][0] == 'd':
+                break
+            else:
+                if line.split()[0] == 'freq':
+                    if not First:
+                        modes.append(modesatfreq)
+                    modesatfreq = []
+                    First = False
+                elif line.split()[0][0] == '*': continue    
+                else:
+                    vecs = line.split()[1:-1]
+                    
+                    dummymode =  np.array([float(vecs[0])+1j*float(vecs[1]),float(vecs[2])+1j*float(vecs[3]),float(vecs[4])+1j*float(vecs[5])])
+                    modesatfreq.append(dummymode)
+    return modes
