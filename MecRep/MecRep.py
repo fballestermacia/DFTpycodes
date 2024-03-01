@@ -20,7 +20,7 @@ def chech_permu(permu):
    
 
 if __name__ == '__main__':
-    scf_file = r'AgP2\Phonons_V2\AgP2_scf.in'
+    scf_file = r'data/AgP2/Phonons/AgP2.scf.pwi'
     structure = io.read(scf_file)
     
     basisvec = structure.get_cell()
