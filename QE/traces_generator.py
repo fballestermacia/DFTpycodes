@@ -69,11 +69,16 @@ def permutation_matrix(pos,r,t,q,sym_prec=4):
     return permu 
 
 
+def symmetryeigval(modefunc,rs,ts):
+    whatist=ts
+
+
+
 if __name__ == '__main__':
     
     factor = 0.123983
     
-    scf_file = r'AgP2\Phonons_V2\AgP2_scf.in'
+    scf_file = r'data/AgP2/Phonons/AgP2.scf.pwi'
     structure = io.read(scf_file)
 
     basisvec = structure.get_cell()
@@ -88,8 +93,8 @@ if __name__ == '__main__':
     SG = sym_data.get("number")
     nsym = len(rotations)
     
-    qlabels, positions, qpoints = utilsQE.readHighSymPointsPhonon(r"AgP2\Phonons_V2\matdyn_AgP2.in", retKpoints=True)
-    notqpoints, bands = utilsQE.readPhononbandFreq(r"AgP2\Phonons_V2\AgP2.freq.gp")
+    qlabels, positions, qpoints = utilsQE.readHighSymPointsPhonon(r"data/AgP2/Phonons/matdyn.in", retKpoints=True)
+    notqpoints, bands = utilsQE.readPhononbandFreq(r"data/AgP2/Phonons/AgP2.freq.gp")
     
     gammaindex = qpoints.index([0,0,0])
     dummyqo = []
@@ -126,7 +131,7 @@ if __name__ == '__main__':
                 newbands[i][j] = 0.
     
     
-    with open(r"DFTpycodes-main\QE\testTRACESC.txt",'w') as f:
+    with open(r"DFTpycodes/QE/testTRACESC.txt",'w') as f:
         f.write(str(len(bands))+'\n')
         f.write('0'+'\n')
         
@@ -149,6 +154,7 @@ if __name__ == '__main__':
             irreps, rotationslgroup, translationslgroup, mapping_little_group = get_spacegroup_irreps(
                 basisvec, atmpos, atmnum, symk[ik]
             )
+            modes = utilsQE.readModesatKpoin(symk[ik],r'data/AgP2/Phonons/matdyn.modes', scffile=r'data/AgP2/Phonons/AgP2.scf.pwo')
             
             lgtag = mapping_little_group
             f.write(str(len(lgtag))+'\n')
@@ -158,9 +164,9 @@ if __name__ == '__main__':
             #print(irreps)
             for l, bi in enumerate(bandindex[ik]):
                 f.write('{:5s}{:3s}{:12.6f}'.format(str(bi[0]),str(len(bi)),newbands[ik][bi[0]-1]))
-                for iopr in range(len(lgtag)):
-                    print(len(irreps), iopr)
-                    print(np.trace(irreps[iopr])[0])
-                    f.write('{:10.5f}{:10.5f}'.format(np.real(np.trace(irreps[iopr])[0]) ,np.imag(np.trace(irreps[iopr])[0])))
+                #for iopr in range(len(lgtag)):
+                    #print(len(irreps), iopr)
+                    #print(np.trace(irreps[iopr])[0])
+                    #f.write('{:10.5f}{:10.5f}'.format(np.real(np.trace(irreps[iopr])[0]) ,np.imag(np.trace(irreps[iopr])[0])))
                 f.write('\n')
         

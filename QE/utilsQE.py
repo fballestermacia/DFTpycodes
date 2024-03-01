@@ -99,14 +99,18 @@ def readHighSymPointsPhonon(matdynfile, retKpoints=False):  #matdynfile=matdyn.i
     filelines = [line for line in open(matdynfile) if line.strip()]
     qbandform=False
     for i,fline in enumerate(filelines):
-        
+        fline = fline.strip()
         if fline.split()[0]=='readtau' and fline.split()[-1]=='.true.':
             continue #TODO: INCLUDE THE CASE WHERE ATOMIC POSITIONS ARE READ
 
         if fline.split()[0]=='q_in_band_form' and (fline.split()[-1]=='.true.'or fline.split()[-1]=='.true.,'):
             qbandform=True
+            
+        elif fline.split('=')[0]=='q_in_band_form' and (fline.split('=')[-1]=='.true.'or fline.split('=')[-1]=='.true.,'):
+            qbandform=True
+            
 
-        if fline.split()[0]=='/':
+        if fline.split()[0]==r'/':
             if qbandform:
                 start = i+1
 
