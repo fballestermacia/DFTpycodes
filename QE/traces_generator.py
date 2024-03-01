@@ -8,7 +8,7 @@ from spgrep.representation import get_character
 import utilsQE
 
 
-def band_indices(bandsatqpoint, tol=5e-3):
+def band_indices(bandsatqpoint, tol=1e-2):
     indices = []
     currentden = []
     empty =True
@@ -34,6 +34,7 @@ def band_indices(bandsatqpoint, tol=5e-3):
 
 def permutation_matrix(pos,r,t,q,sym_prec=4):
     kpoint = q
+    
     num_atoms = len(pos)
     permu = np.zeros([num_atoms,num_atoms], dtype='complex')
     cells = np.zeros([num_atoms,3])
@@ -65,12 +66,22 @@ def permutation_matrix(pos,r,t,q,sym_prec=4):
         #Find permutation
         for k in range(num_atoms):
             if np.array_equal(np.round(new_pos,decimals=sym_prec),np.round(pos[k],decimals=sym_prec)):
-                permu[k,j]=1*np.round(np.exp(2j*np.pi*np.matmul(np.transpose(kpoint), cells[k])),5)
+                permu[k,j]=1*np.round(np.exp(-2j*np.pi*np.matmul(np.transpose(kpoint), cells[k])),5) #SOMETHING IS WRONG IN THE PHASE
     return permu 
 
 
-def symmetryeigval(modefunc,rs,ts):
-    whatist=ts
+def similarity_transformation(U, mat):
+    """ U x M x U^-1 """
+    return np.matmul(U, np.matmul(mat, np.linalg.inv(U)))
+
+
+def symmetryeigval(modefunc,r,t, latticevec, permatq):
+    U = np.transpose(latticevec)
+    O = similarity_transformation(U,r)
+    symoperator = np.kron(permatq,O)
+    eigval = np.matmul(np.transpose(np.conjugate(modefunc.flatten())),np.matmul(symoperator,modefunc.flatten()))
+
+    return eigval
 
 
 
@@ -156,17 +167,23 @@ if __name__ == '__main__':
             )
             modes = utilsQE.readModesatKpoin(symk[ik],r'data/AgP2/Phonons/matdyn.modes', scffile=r'data/AgP2/Phonons/AgP2.scf.pwo')
             
+
             lgtag = mapping_little_group
             f.write(str(len(lgtag))+'\n')
             for opr in lgtag:
                 f.write(str(opr+1)+'  ')
             f.write('\n')
-            #print(irreps)
+            
             for l, bi in enumerate(bandindex[ik]):
                 f.write('{:5s}{:3s}{:12.6f}'.format(str(bi[0]),str(len(bi)),newbands[ik][bi[0]-1]))
-                #for iopr in range(len(lgtag)):
-                    #print(len(irreps), iopr)
-                    #print(np.trace(irreps[iopr])[0])
-                    #f.write('{:10.5f}{:10.5f}'.format(np.real(np.trace(irreps[iopr])[0]) ,np.imag(np.trace(irreps[iopr])[0])))
+                #print(bi)
+                for iopr in range(len(lgtag)):
+                    symeigval = 0
+                    for iden, degen in enumerate(bi):
+                        
+                        symeigval += symmetryeigval(np.array(modes[degen-1]),rotationslgroup[iopr], translationslgroup[iopr], basisvec[:], 
+                                                    permutation_matrix(atmpos,rotationslgroup[iopr], translationslgroup[iopr], symk[ik]))
+                    
+                    f.write('{:10.5f}{:10.5f}'.format(np.real(symeigval) ,np.imag(symeigval)))
                 f.write('\n')
         

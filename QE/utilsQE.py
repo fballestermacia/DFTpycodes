@@ -285,6 +285,7 @@ def readcellvec(scffile):
             rec.append([float(line.split()[3]),float(line.split()[4]),float(line.split()[5])])
     return np.array(cryst), np.array(rec)
 
+
 def readModesatKpoin(kpointvec, modesfile='matdyn.modes',scffile='scf.out'):
     """
     Returns an array of vector modes from the matdyn.modes file of QE at a given k-point
@@ -309,15 +310,19 @@ def readModesatKpoin(kpointvec, modesfile='matdyn.modes',scffile='scf.out'):
             if line.split()[0][0] == 'd':
                 break
             else:
+                
                 if line.split()[0] == 'freq':
                     if not First:
                         modes.append(modesatfreq)
                     modesatfreq = []
                     First = False
-                elif line.split()[0][0] == '*': continue    
+                elif line.split()[0][0] == '*': 
+                    if not First: modes.append(modesatfreq)
+                    continue    
                 else:
                     vecs = line.split()[1:-1]
                     
                     dummymode =  np.array([float(vecs[0])+1j*float(vecs[1]),float(vecs[2])+1j*float(vecs[3]),float(vecs[4])+1j*float(vecs[5])])
                     modesatfreq.append(dummymode)
+    
     return modes
