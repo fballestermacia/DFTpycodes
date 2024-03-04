@@ -159,14 +159,14 @@ if __name__ == '__main__':
     
     
     bandindex = []
-    
+    newbands *= factor
     for i in range(len(newbands)):
         #print(newbands)
-        bandindex.append(band_indices(newbands[i]))
+        bandindex.append(band_indices(newbands[i],tol=1e-4))
         #stop = stop
     
     
-    newbands *= factor
+    
     for i in range(len(newbands)):
         for j in range(len(newbands[i])):
             if abs(newbands[i][j]) < 5e-2:
@@ -219,9 +219,10 @@ if __name__ == '__main__':
                 for iopr in range(len(lgtag)):
                     symeigval = 0
                     for iden, degen in enumerate(bi):
-                        print(degen-1)
-                        symeigval += symmetryeigval(np.array(modes[degen-1]),rotationslgroup[iopr], translationslgroup[iopr], basisvec[:], 
+                        seval = symmetryeigval(np.array(modes[degen-1]),rotationslgroup[iopr], translationslgroup[iopr], basisvec[:], 
                                                     permutation_matrix(atmpos,rotationslgroup[iopr], translationslgroup[iopr], symk[ik]))
+                        symeigval += seval
+                        print(bi, iopr, seval, symeigval)
                     
                     f.write('{:10.5f}{:10.5f}'.format(np.real(symeigval) ,np.imag(symeigval)))
                 f.write('\n')

@@ -51,16 +51,27 @@ def dynmat(alpha,beta,M1,M2,k):
     ])
     return Dyn
 
+
+def berrypposop(q, lmode, positions):
+    exponential = np.exp(1j*q*positions)
+
+    matelement = np.dot(np.conjugate(lmode),np.multiply(exponential,lmode))
+    center = 1/q*np.imag(np.log(matelement))
+    return center
+    
+
+
+
 if __name__ == '__main__':
     alpha = 1
     beta = 1
-    M1 = 1
+    M1 = 1.5
     M2 = 1
-    N = 4
+    N = 100
     ls = np.arange(N)-1/2*N
     ks = np.pi/N*ls
     
-    ms = [-0.1]#np.copy(ls)-0.25
+    ms = [-0.] #centered at -0.25     #np.copy(ls)-0.25
 
     xcoords = np.array([-0.25,0.25])
     
@@ -76,11 +87,11 @@ if __name__ == '__main__':
 
 
     locmodes = LocalizedTransformastion(modes,ks,ms,ls)
-
+    
     
     natoms = 2
 
-    qpointindex = N//2
+    qpointindex = 3#N//2
     modeindex = 0
     mcellindex = 0#N//2
     
@@ -103,13 +114,17 @@ if __name__ == '__main__':
     locpolvec = locmodes[modeindex,mcellindex,:,:]
     locpolvec = np.reshape(locpolvec,(N,natoms))
     
-    locnorm = [np.linalg.norm(vec) for vec in locpolvec.flatten()]
+    
+    locnorm = [np.linalg.norm(vec) for vec in locpolvec.flatten()] #i think this is wrong but whatever
     locnormalize = np.max(locnorm)
     locpolvec /= locnormalize
     locnorm = [np.linalg.norm(vec) for vec in locpolvec.flatten()]
     locpolvec = locpolvec.flatten()
 
+    
 
+    pos =  berrypposop(ks[qpointindex], locmodes[modeindex,mcellindex].flatten(),latpos[:])
+    print(pos)
     ################################
     #Plotting
     ################################
@@ -144,6 +159,7 @@ if __name__ == '__main__':
     ax3.scatter(latpos,np.zeros(len(latpos)),marker='o',linewidths=1)
     ax3.quiver(latpos,np.zeros(len(latpos)), np.real(locpolvec),np.zeros(len(locpolvec)))
     ax3.plot(latpos, locnorm)
+    ax3.vlines(pos, 0,1, 'r')
     ax3.set_title("Localized polarization vector, real part")
     ax3.set_xlabel('X')
     ax3.set_ylabel('Y')
@@ -157,7 +173,14 @@ if __name__ == '__main__':
     ax4.set_xlabel('X')
     ax4.set_ylabel('Y')
     
-
+    fig5 = plt.figure()
+    ax5 = fig5.add_subplot()
+    ax5.scatter(latpos,np.zeros(len(latpos)),c='k',marker='o',linewidths=1)
+    ax5.plot(latpos, locnorm)
+    ax5.vlines(pos, 0,1, 'r')
+    ax5.set_title("Localized polarization vector, magnitude")
+    ax5.set_xlabel('X')
+    ax3.set_ylabel('Y')
     
     plt.show()
     

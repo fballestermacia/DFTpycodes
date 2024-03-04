@@ -104,8 +104,16 @@ def LocalizedTransformastion(modesperq, qvecs, superatmpos, atmpos, reduced_cell
     #print(locmodes)
     return newpolvecs, locmodes
         
-        
-        
+
+def berrypposop(q, locmode, positions):
+    locmode = np.reshape(locmode,(len(positions),3))
+    exponential = [np.exp(2j*np.pi*np.dot(q,pos)) for pos in positions]
+    
+    center = np.empty(3)
+    for i in range(3):
+        matelement = np.dot(np.conjugate(locmode[:,i]),np.multiply(exponential,locmode[:,i]))
+        center[i] = 1/np.linalg.norm(q)*np.imag(np.log(matelement))
+    return center    
 
 
 
@@ -138,12 +146,12 @@ if __name__ == '__main__':
     #dyn2.save_qe('testmatdyn')
     #print(dyn.structure.unit_cell)
     
-    print(np.shape(dyn2.structure.coords))
+    #print(np.shape(dyn2.structure.coords))
     
     
     #let's do only one m to save memory
     l = dyn.GetSupercell()
-    mx, my, mz = 2,2,2 #np.arange(4),np.arange(4),np.arange(4)
+    mx, my, mz = 0,0,0 #np.arange(4),np.arange(4),np.arange(4)
     
     #print(dyn.structure.unit_cell)
     #print(dyn2.structure.unit_cell)
@@ -156,7 +164,6 @@ if __name__ == '__main__':
     for i in range(dyn2.structure.N_atoms):
         xcoords[i,:] = CC.Methods.covariant_coordinates(dyn2.structure.unit_cell, dyn2.structure.coords[i,:])
 
-    
 
     modes, locmodes = LocalizedTransformastion(modes,dyn.q_tot,dyn2.structure.coords,dyn.structure.coords,dyn.structure.unit_cell, [mx,my,mz],l)
     #print(np.shape(modes), np.shape(modes[0]))
@@ -164,6 +171,15 @@ if __name__ == '__main__':
 
     finishtime = datetime.now()
     print(finishtime-inittime)
+
+    modeindex = 0
+    print(dyn.q_tot[-1])
+
+    center = berrypposop(dyn.q_tot[-1],locmodes[modeindex],dyn2.structure.coords) #TODO: CHECK AND IF NECESSARY CHANGE THE QVECTORS TO AN APPROPIATE BASIS. WE SHOULD NOT NEED A PI FACTOR IN ANY EXPONENTIAL
+    print(center)
+
+    xcenter = CC.Methods.covariant_coordinates(dyn2.structure.unit_cell, center)
+
     atypes = [x-1 for x in dyn2.structure.get_atomic_types()]
     
     col = ['g','k']
@@ -171,8 +187,6 @@ if __name__ == '__main__':
 
     natoms = len(atypes)
     
-
-    modeindex = 0
     latpos = xcoords
 
     polvec = modes[0][modeindex]
@@ -187,6 +201,8 @@ if __name__ == '__main__':
 
     locnormalize = np.max(np.linalg.norm(locpolvec,axis=0))
     locpolvec /= locnormalize
+
+
 
     ################################
     #Plotting
@@ -220,6 +236,7 @@ if __name__ == '__main__':
 
     ax3.scatter(latpos[:,0],latpos[:,1],latpos[:,2],marker='o',linewidths=1, c=colors)
     ax3.quiver(latpos[:,0],latpos[:,1],latpos[:,2], locpolvec[:,0],locpolvec[:,1],locpolvec[:,2], length=0.5)
+    ax3.scatter(xcenter[0],xcenter[1],xcenter[2],s=20,c='r')
     ax3.set_title("Localized polarization vector, real part")
     ax3.set_xlabel('X')
     ax3.set_ylabel('Y')
