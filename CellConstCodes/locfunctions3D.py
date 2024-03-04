@@ -63,15 +63,15 @@ def LocalizedTransformastion(modesperq, qvecs, superatmpos, atmpos, reduced_cell
                         for lx in range(l[0]):
                             #print(i,a,b,np.dot(q,[reduced_cell[i]*(np.dot(atmpos[b],reduced_cell[i])//1-m[i]) for i in range(3)]))
                             ldummy = [lx,ly,lz]
-                            indexX=3*len(atmpos)*lx #THIS IS WRONG CHANGE IT
+                            indexX=3*len(atmpos)*lx 
                             indexY=3*len(atmpos)*l[0]*ly
                             indexZ=3*len(atmpos)*l[1]*l[0]*lz
                             indextot = indexX+indexY+indexZ
                             #print(np.subtract(ldummy,m))
                             
                             #print(a+indextot, '/', 3*len(superatmpos))
-                            newpolvecs[i,3*b:3*b+3,a+indextot] = modesperq[i][3*b:3*b+3,a]*np.exp(2j*np.pi*np.dot(q,np.sum(reduced_cell*ldummy,axis=0)))
-                            quasiVs[i,3*b:3*b+3,a+indextot] = modesperq[i][3*b:3*b+3,a]*np.exp(2j*np.pi*np.dot(q,np.sum(reduced_cell*np.subtract(ldummy,m),axis=0)))
+                            newpolvecs[i,3*b:3*b+3,a+indextot] = modesperq[i][3*b:3*b+3,a]*np.exp(1j*np.dot(q,np.sum(reduced_cell*ldummy,axis=0)))
+                            quasiVs[i,3*b:3*b+3,a+indextot] = modesperq[i][3*b:3*b+3,a]*np.exp(1j*np.dot(q,np.sum(reduced_cell*np.subtract(ldummy,m),axis=0)))
         #print('here',reduced_cell,ldummy,'\n 2here',reduced_cell*ldummy,'\n 3here',np.sum(reduced_cell*ldummy,axis=0),'\n 4here',np.dot(q,np.sum(reduced_cell*ldummy,axis=0)))
 
     '''for i in range(len(modesperq)):
@@ -107,7 +107,7 @@ def LocalizedTransformastion(modesperq, qvecs, superatmpos, atmpos, reduced_cell
 
 def berrypposop(q, locmode, positions):
     locmode = np.reshape(locmode,(len(positions),3))
-    exponential = [np.exp(2j*np.pi*np.dot(q,pos)) for pos in positions]
+    exponential = [np.exp(1j*np.dot(q,pos)) for pos in positions]
     
     center = np.empty(3)
     for i in range(3):
@@ -126,7 +126,7 @@ if __name__ == '__main__':
 
     dyn = CC.Phonons.Phonons()
     dyn.LoadFromQE(fildyn_prefix="data/AgP2/Phonons/dynmats/AgP2.dyn", nqirr=30)
-    #dyn = dyn.InterpolateMesh([6,6,6])
+    dyn = dyn.InterpolateMesh([1,1,10])
     #print(dyn.GetSupercell())
     super_dyn = dyn.GenerateSupercellDyn(dyn.GetSupercell())
     #print(super_dyn.q_tot)
@@ -163,9 +163,18 @@ if __name__ == '__main__':
     xcoords = np.zeros(np.shape(dyn2.structure.coords))
     for i in range(dyn2.structure.N_atoms):
         xcoords[i,:] = CC.Methods.covariant_coordinates(dyn2.structure.unit_cell, dyn2.structure.coords[i,:])
+    
+    NOSCxcoords = np.zeros(np.shape(dyn.structure.coords))
+    for i in range(dyn.structure.N_atoms):
+        NOSCxcoords[i,:] = CC.Methods.covariant_coordinates(dyn.structure.unit_cell, dyn.structure.coords[i,:])
 
+    
+    qvecs = np.zeros(np.shape(dyn.q_tot))
+    for i in range(len(dyn.q_tot)):
+        qvecs[i,:] = CC.Methods.covariant_coordinates(dyn.structure.get_reciprocal_vectors(), dyn.q_tot[i])
+    print(dyn.structure.get_reciprocal_vectors())
 
-    modes, locmodes = LocalizedTransformastion(modes,dyn.q_tot,dyn2.structure.coords,dyn.structure.coords,dyn.structure.unit_cell, [mx,my,mz],l)
+    modes, locmodes = LocalizedTransformastion(modes,qvecs,xcoords,NOSCxcoords,dyn.structure.unit_cell, [mx,my,mz],l)
     #print(np.shape(modes), np.shape(modes[0]))
     #print(np.shape(locmodes), np.shape(locmodes[0]))
 
@@ -173,12 +182,12 @@ if __name__ == '__main__':
     print(finishtime-inittime)
 
     modeindex = 0
-    print(dyn.q_tot[-1])
+    print(qvecs[-1])
 
-    center = berrypposop(dyn.q_tot[-1],locmodes[modeindex],dyn2.structure.coords) #TODO: CHECK AND IF NECESSARY CHANGE THE QVECTORS TO AN APPROPIATE BASIS. WE SHOULD NOT NEED A PI FACTOR IN ANY EXPONENTIAL
+    center = berrypposop(qvecs[-1],locmodes[modeindex],xcoords) #TODO: Check this function
     print(center)
 
-    xcenter = CC.Methods.covariant_coordinates(dyn2.structure.unit_cell, center)
+    xcenter = center#CC.Methods.covariant_coordinates(dyn2.structure.unit_cell, center)
 
     atypes = [x-1 for x in dyn2.structure.get_atomic_types()]
     
@@ -189,7 +198,7 @@ if __name__ == '__main__':
     
     latpos = xcoords
 
-    polvec = modes[0][modeindex]
+    polvec = modes[-1][modeindex]
     polvec = np.reshape(polvec,(natoms,3))
     
     normalize = np.max(np.linalg.norm(polvec,axis=0))
