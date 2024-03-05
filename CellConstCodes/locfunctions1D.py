@@ -71,7 +71,7 @@ if __name__ == '__main__':
     ls = np.arange(N)-1/2*N
     ks = np.pi/N*ls
     
-    ms = [-0.] #centered at -0.25     #np.copy(ls)-0.25
+    ms = [-25.] #centered at -0.25     #np.copy(ls)-0.25
 
     xcoords = np.array([-0.25,0.25])
     
@@ -91,7 +91,8 @@ if __name__ == '__main__':
     
     natoms = 2
 
-    qpointindex = 3#N//2
+    qpointindex = N//2-1 #QPOINT MUST BE CLOSE TO GAMMA
+    print(ks[qpointindex])
     modeindex = 0
     mcellindex = 0#N//2
     
