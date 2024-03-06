@@ -53,6 +53,12 @@ def dynmat(alpha,beta,M1,M2,k):
 
 
 def berrypposop(q, lmode, positions):
+
+    #################################
+    #NOTE: q needs to be sufficiently small, otherwise terms of order O(q\sigma) are significant and the operator does not return the center of the localized function
+    # the bigger the system, the smaller the q vector must be
+    #################################
+
     exponential = np.exp(1j*q*positions)
 
     matelement = np.dot(np.conjugate(lmode),np.multiply(exponential,lmode))
@@ -65,13 +71,13 @@ def berrypposop(q, lmode, positions):
 if __name__ == '__main__':
     alpha = 1
     beta = 1
-    M1 = 1.5
+    M1 = 2
     M2 = 1
-    N = 100
+    N = 50
     ls = np.arange(N)-1/2*N
     ks = np.pi/N*ls
     
-    ms = [-25.] #centered at -0.25     #np.copy(ls)-0.25
+    ms = [0.25] #centered at -0.25     #np.copy(ls)-0.25
 
     xcoords = np.array([-0.25,0.25])
     
@@ -91,8 +97,8 @@ if __name__ == '__main__':
     
     natoms = 2
 
-    qpointindex = N//2-1 #QPOINT MUST BE CLOSE TO GAMMA
-    print(ks[qpointindex])
+    qpointindex = N//2 #QPOINT MUST BE CLOSE TO GAMMA otherwise O(q\sigma) becomes significant
+    
     modeindex = 0
     mcellindex = 0#N//2
     
@@ -124,7 +130,7 @@ if __name__ == '__main__':
 
     
 
-    pos =  berrypposop(ks[qpointindex], locmodes[modeindex,mcellindex].flatten(),latpos[:])
+    pos =  berrypposop(-1e-12, locmodes[modeindex,mcellindex].flatten(),latpos[:])
     print(pos)
     ################################
     #Plotting
@@ -135,7 +141,7 @@ if __name__ == '__main__':
     
     
     ax.scatter(latpos,np.zeros(len(latpos)),marker='o',linewidths=1)
-    ax.quiver(latpos,np.zeros(len(latpos)), np.real(polvec),np.zeros(len(polvec)))
+    ax.quiver(latpos,np.zeros(len(latpos)), np.zeros(len(polvec)),np.real(polvec))
     ax.plot(latpos, norm)
     ax.set_title("Polarization vector, real part")
     ax.set_xlabel('X')
@@ -145,7 +151,7 @@ if __name__ == '__main__':
     fig2 = plt.figure()
     ax2 = fig2.add_subplot()
     ax2.scatter(latpos,np.zeros(len(latpos)),marker='o',linewidths=1)
-    ax2.quiver(latpos,np.zeros(len(latpos)), np.imag(polvec),np.zeros(len(polvec)), color='r')
+    ax2.quiver(latpos,np.zeros(len(latpos)), np.zeros(len(polvec)),np.imag(polvec), color='r')
     ax2.set_title("Polarization vector, imaginary part")
     ax2.set_xlabel('X')
     ax2.set_ylabel('Y')
@@ -158,7 +164,7 @@ if __name__ == '__main__':
     ax3 = fig3.add_subplot()
 
     ax3.scatter(latpos,np.zeros(len(latpos)),marker='o',linewidths=1)
-    ax3.quiver(latpos,np.zeros(len(latpos)), np.real(locpolvec),np.zeros(len(locpolvec)))
+    ax3.quiver(latpos,np.zeros(len(latpos)), np.zeros(len(locpolvec)),np.real(locpolvec))
     ax3.plot(latpos, locnorm)
     ax3.vlines(pos, 0,1, 'r')
     ax3.set_title("Localized polarization vector, real part")
@@ -169,7 +175,7 @@ if __name__ == '__main__':
     fig4 = plt.figure()
     ax4 = fig4.add_subplot()
     ax4.scatter(latpos,np.zeros(len(latpos)),marker='o',linewidths=1)
-    ax4.quiver(latpos,np.zeros(len(latpos)), np.imag(locpolvec),np.zeros(len(locpolvec)),  color='r')
+    ax4.quiver(latpos,np.zeros(len(latpos)), np.zeros(len(locpolvec)), np.imag(locpolvec),  color='r')
     ax4.set_title("Localized polarization vector, imaginary part")
     ax4.set_xlabel('X')
     ax4.set_ylabel('Y')
