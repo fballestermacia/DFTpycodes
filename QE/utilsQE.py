@@ -88,7 +88,7 @@ def readPhononbandFreq(freqgpfile): #freqgpfile=SYSTEM.freq.gp
 
     data = np.loadtxt(freqgpfile)
 
-    nbands = data.shape[1] - 1
+    #nbands = data.shape[1] - 1
     qpoints = data[:, 0]
     bands = np.transpose(data)[1:,]
 

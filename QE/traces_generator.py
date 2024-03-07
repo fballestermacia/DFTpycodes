@@ -10,8 +10,8 @@ from cellconstructor.Methods import covariant_coordinates
 import su2rot
 #np.set_printoptions(threshold=np.inf)
 
-def band_indices(bandsatqpoint, tol=3e-3):
-    indices = []
+def band_indices(bandsatqpoint, tol=1e-3):
+    '''indices = []
     currentden = []
     empty =True
     for i in range(len(bandsatqpoint)):
@@ -30,45 +30,40 @@ def band_indices(bandsatqpoint, tol=3e-3):
                 currentden.append(i+1)
                 empty =False
         
-    indices.append(currentden)
+    indices.append(currentden)'''
+
+    indices = []
+    done = []
+    for i in range(len(bandsatqpoint)):
+        if i in done:
+            continue
+        else:
+            f_set = [i]
+            done.append(i)
+        for j in range(i + 1, len(bandsatqpoint)):
+            if (np.abs(bandsatqpoint[f_set] - bandsatqpoint[j]) < tol).any():
+                f_set.append(j)
+                done.append(j)
+        indices.append(f_set[:])
+
     return indices
 
 
 def permutation_matrix(pos,r,t,q,sym_prec=4):
-    kpoint = q
     
     num_atoms = len(pos)
     permu = np.zeros([num_atoms,num_atoms], dtype='complex')
-    cells = np.zeros([num_atoms,3])
-    
-    '''phase = np.exp(1j*np.matmul(np.transpose(np.matmul(rotations[i],kpoint)), translations[i]))
-    phase2 = np.exp(1j*np.matmul(np.transpose(kpoint), translations[i]))
-    print(phase)
-    print(phase2)'''
     
     for j in range(num_atoms):
         new_pos=np.matmul(r,pos[j]) + t
-        #print(positions[j],new_pos)
-        
-        #Store phases
-        
-        #Move everything back to Unit Cell
-        if np.any(new_pos<0) or np.any(new_pos>=1):
-            for k in range(3):
-                while new_pos[k]<0:
-                    new_pos[k]=new_pos[k]+1
-                    cells[j,k]=cells[j,k]-1
-                    
-                while new_pos[k]>=1:
-                    new_pos[k]=new_pos[k]-1
-                    cells[j,k]=cells[j,k]+1
-        
-        #print(positions[j],new_pos)
 
-        #Find permutation
-        for k in range(num_atoms):
-            if np.array_equal(np.round(new_pos,decimals=sym_prec),np.round(pos[k],decimals=sym_prec)):
-                permu[k,j]=1*np.round(np.exp(-2j*np.pi*np.sum(kpoint*cells[k])),5) #SOMETHING IS WRONG IN THE PHASE
+        for j2 in range(num_atoms):
+            diff = new_pos-pos[j2]
+            if (abs(diff - np.rint(diff)) < 10**(-1*sym_prec)).all():
+                phase = np.dot(q, new_pos-pos[j2])
+
+                permu[j2,j] = np.exp(-2j*np.pi*phase)
+
     return permu 
 
 
@@ -77,15 +72,24 @@ def similarity_transformation(U, mat):
     return np.matmul(U, np.matmul(mat, np.linalg.inv(U)))
 
 
-def symmetryeigval(modefunc,r,t, latticevec, permatq):
-    U = np.transpose(latticevec)
+def symmetryeigval(modefunc,r,t, latticevec, permatq, bandindices):
+    U = latticevec
     O = similarity_transformation(U,r)
-    #print(np.sum(permatq))
     symoperator = np.kron(permatq,O)
     
-    eigval = np.matmul(np.transpose(np.conjugate(modefunc.flatten())),np.matmul(symoperator,modefunc.flatten()))
+    l = len(bandindices)
+    if l == 1:
+        eigval =np.matmul(np.transpose(np.conjugate(modefunc[bi].flatten())),np.matmul(symoperator,modefunc[bi].flatten()))
     
-
+    else:
+        mat = np.zeros((l,l), dtype=np.complex128)
+        for i, b_i in enumerate(bandindices):
+            vec_i = modefunc[b_i].flatten()
+            for j, b_j in enumerate(bandindices):
+                vec_j = modefunc[b_j].flatten()
+                mat[i, j] = np.vdot(vec_i, np.dot(symoperator, vec_j))
+        
+        eigval = np.trace(mat)
     return eigval
 
 
@@ -136,6 +140,7 @@ if __name__ == '__main__':
     qlabels, positions, qpoints = utilsQE.readHighSymPointsPhonon(r"data/AgP2/Phonons/matdyn.in", retKpoints=True)
     notqpoints, bands = utilsQE.readPhononbandFreq(r"data/AgP2/Phonons/AgP2.freq.gp")
     
+
     gammaindex = qpoints.index([0,0,0])
     dummyqo = []
     dummyqo.append([0.,0.,0.])
@@ -155,22 +160,28 @@ if __name__ == '__main__':
         newqpoints.append(dummyqo[i])
         newpos.append(dummypos[i])
     
-    newbands = np.sort(np.transpose(bands[:,newpos]), axis=0)
+    
+    
+    newbands = np.transpose(bands[:,newpos])
+
     
     
     bandindex = []
-    newbands *= factor
+    
     for i in range(len(newbands)):
         #print(newbands)
-        bandindex.append(band_indices(newbands[i],tol=1e-4))
+        bandindex.append(band_indices(newbands[i],tol=5e-3))
         #stop = stop
     
-    
+    newbands *= factor
     
     for i in range(len(newbands)):
         for j in range(len(newbands[i])):
             if abs(newbands[i][j]) < 5e-2:
                 newbands[i][j] = 0.
+    
+    
+    
     
     atmposcov = atmpos#covariant_coordinates(basisvec[:],atmpos)
     #print(atmposcov)
@@ -206,6 +217,9 @@ if __name__ == '__main__':
 
             modes = utilsQE.readModesatKpoin(symk[ik],r'data/AgP2/Phonons/matdyn.modes', scffile=r'data/AgP2/Phonons/AgP2.scf.pwo')
             
+            '''for i, m in enumerate(modes):
+                for j, m2 in enumerate(modes):
+                    print(i, j, np.dot(np.array(np.conjugate(m2)).flatten(),np.array(m).flatten()))'''
 
             lgtag = mapping_little_group
             f.write(str(len(lgtag))+'\n')
@@ -214,16 +228,13 @@ if __name__ == '__main__':
             f.write('\n')
             
             for l, bi in enumerate(bandindex[ik]):
-                f.write('{:5s}{:3s}{:12.6f}'.format(str(bi[0]),str(len(bi)),newbands[ik][bi[0]-1]))
+                f.write('{:5s}{:3s}{:12.6f}'.format(str(bi[0]+1),str(len(bi)),newbands[ik][bi[0]]))
                 #print(bi)
                 for iopr in range(len(lgtag)):
-                    symeigval = 0
-                    for iden, degen in enumerate(bi):
-                        seval = symmetryeigval(np.array(modes[degen-1]),rotationslgroup[iopr], translationslgroup[iopr], basisvec[:], 
-                                                    permutation_matrix(atmpos,rotationslgroup[iopr], translationslgroup[iopr], symk[ik]))
-                        symeigval += seval
-                        print(bi, iopr, seval, symeigval)
-                    
+
+                    symeigval = symmetryeigval(np.array(modes),rotationslgroup[iopr], translationslgroup[iopr], basisvec[:], 
+                                                    permutation_matrix(atmpos,rotationslgroup[iopr], translationslgroup[iopr], symk[ik]), bi)
+
                     f.write('{:10.5f}{:10.5f}'.format(np.real(symeigval) ,np.imag(symeigval)))
                 f.write('\n')
         

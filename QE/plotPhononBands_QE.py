@@ -3,10 +3,12 @@ import matplotlib.pyplot as plt
 import utilsQE
 
 
+factor = 0.123983
+qpoints, bands = utilsQE.readPhononbandFreq(r"data/AgP2/Phonons/AgP2.freq.gp")
 
-qpoints, bands = utilsQE.readPhononbandFreq(r"AgP2\Phonons_V2\AgP2.freq.gp")
+qlabels, positions = utilsQE.readHighSymPointsPhonon(r"data/AgP2/Phonons/matdyn.in")
 
-qlabels, positions = utilsQE.readHighSymPointsPhonon(r"AgP2\Phonons_V2\matdyn_AgP2.in")
+bands *= factor
 
 plt.figure()
 
@@ -20,7 +22,7 @@ plt.xticks(ticks=qpoints[positions[:]], labels=qlabels)
 
 plt.axhline(y=0, linewidth=0.5, color='b', linestyle='--')
 
-plt.ylabel("Frequency (cm$^{-1}$)")
+plt.ylabel("Frequency (meV)" )#(cm$^{-1}$)")
 plt.xlim(qpoints[0], qpoints[-1])
 #plt.ylim(0, )
 plt.show()

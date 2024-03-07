@@ -10,8 +10,8 @@ if __name__ == '__main__':
     ymin = 4
     ymax = 18
     
-    kpoints, bands = utilsQE.read_filband('QE_projects\\AgP2\\bands_norelaxed\\filbandAgP2')
-    kpoints2, nlines, hsp, B, pointsinline = utilsQE.read_bandsin('QE_projects\\AgP2\\bands_norelaxed\\AgP2_bands.in')
+    kpoints, bands = utilsQE.read_filband('data/AgP2/electrons/filbandAgP2')
+    kpoints2, nlines, hsp, B, pointsinline = utilsQE.read_bandsin('data/AgP2/electrons/AgP2_bands.in')
     nlines = nlines-1
     width, height = fig_size
     
@@ -63,6 +63,6 @@ if __name__ == '__main__':
     
     ax.set_xticks(kpt_bounds)
     ax.set_xticklabels(hsp)
-    ax.set_ylim(ymin, ymax)
+    #ax.set_ylim(ymin, ymax)
     
     plt.show()
