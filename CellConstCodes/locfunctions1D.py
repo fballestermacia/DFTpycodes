@@ -69,14 +69,16 @@ def berrypposop(q, lmode, positions):
 
 
 if __name__ == '__main__':
-    alpha = 1
+    alpha = 10
     beta = 1
-    M1 = 2
+    M1 = 1
     M2 = 1
     N = 50
     ls = np.arange(N)-1/2*N
     ks = np.pi/N*ls
     
+
+
     ms = [0.25] #centered at -0.25     #np.copy(ls)-0.25
 
     xcoords = np.array([-0.25,0.25])
@@ -91,6 +93,17 @@ if __name__ == '__main__':
                 for b in range(2): #atom
                     modes[i,a,j,b] = dummymodes[i][b,a]*np.exp(1j*k*(cell)) 
 
+    if M1 == M2:
+        dummycopy = modes.copy()
+        phase0a = np.exp(1j*np.angle(dummycopy[:,0,N//2,0] + dummycopy [:,1,N//2,0]))
+        phase0b = np.exp(1j*np.angle(dummycopy[:,0,N//2,1] + dummycopy [:,1,N//2,1]))
+        phase1a = np.exp(1j*np.angle(dummycopy[:,0,N//2,0] - dummycopy [:,1,N//2,0]))
+        phase1b = np.exp(1j*np.angle(dummycopy[:,0,N//2,1] - dummycopy [:,1,N//2,1]))
+        modes[:,0,:,0] *= phase0a 
+        modes[:,0,:,1] *= phase0b 
+        modes[:,1,:,0] *= phase1a 
+        modes[:,1,:,1] *= phase1b 
+        
 
     locmodes = LocalizedTransformastion(modes,ks,ms,ls)
     
@@ -99,7 +112,7 @@ if __name__ == '__main__':
 
     qpointindex = N//2 #QPOINT MUST BE CLOSE TO GAMMA otherwise O(q\sigma) becomes significant
     
-    modeindex = 0
+    modeindex = 1
     mcellindex = 0#N//2
     
     
