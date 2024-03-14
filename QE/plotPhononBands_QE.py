@@ -11,9 +11,11 @@ qlabels, positions = utilsQE.readHighSymPointsPhonon(r"data/AgP2/Phonons/matdyn.
 bands *= factor
 
 plt.figure()
+topocolors = 'g'*10+'g'*4+'k'*12+'g'*6+'k'*4
 
-for band in bands:
-    plt.plot(qpoints, band, linewidth=1, alpha=1, color='k')
+
+for i,band in enumerate(bands):
+    plt.plot(qpoints, band, linewidth=1, alpha=1, color=topocolors[i])
 
 for pos in positions:
     plt.axvline(x=qpoints[pos], linewidth=0.5, color='k')

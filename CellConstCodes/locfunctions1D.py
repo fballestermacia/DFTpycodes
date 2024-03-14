@@ -44,6 +44,31 @@ def LocalizedTransformastion(modesperq,ks,ms,ls):
     return locmodes
 
 
+def DelocalizeTransformation(modesperRs, ks, ms, ls):
+    quasiUs = np.empty((len(ks),2,len(ms),len(ls),2),dtype=np.complex128)
+    quasiVs = np.empty((len(ks),2,len(ms),len(ls),2),dtype=np.complex128) 
+    # INDICES ARE: q-point, j, m, l, kappa,
+
+    for i,k in enumerate(ks): #qpoint
+        for a in range(2): # mode
+            for j,mcell in enumerate(ms): #m vector
+                for l in range(len(ls)): #l vector
+                    for b in range(2): #atom
+                        quasiUs[i,a,j,l,b] = modesperRs[a,j,l,b]*np.exp(1j*k*mcell)
+
+    
+    ##############
+    #TODO: NORMALIZE THE VECTORS 
+    ##############
+
+    
+
+    delocmodes = np.sum(quasiUs,axis=2)
+    #locmodes = locmodes*np.exp(-1j*np.angle(locmodes))
+    #print(locmodes)
+    return delocmodes
+
+
 def dynmat(alpha,beta,M1,M2,k):
     Dyn = np.array([
         [(alpha+beta)/M1, (alpha+beta*np.exp(-1j*k))/(M1*M2)**0.5],
@@ -69,9 +94,9 @@ def berrypposop(q, lmode, positions):
 
 
 if __name__ == '__main__':
-    alpha = 10
+    alpha = 1
     beta = 1
-    M1 = 1
+    M1 = 2
     M2 = 1
     N = 50
     ls = np.arange(N)-1/2*N
@@ -79,7 +104,7 @@ if __name__ == '__main__':
     
 
 
-    ms = [0.25] #centered at -0.25     #np.copy(ls)-0.25
+    ms = np.copy(ls)-0.25
 
     xcoords = np.array([-0.25,0.25])
     
@@ -106,14 +131,14 @@ if __name__ == '__main__':
         
 
     locmodes = LocalizedTransformastion(modes,ks,ms,ls)
-    
+    nolocmodes = DelocalizeTransformation(locmodes,ks,ms,ls)
     
     natoms = 2
 
     qpointindex = N//2 #QPOINT MUST BE CLOSE TO GAMMA otherwise O(q\sigma) becomes significant
     
     modeindex = 1
-    mcellindex = 0#N//2
+    mcellindex = N//2-10
     
     
     latpos = np.kron(np.ones(len(ls)),xcoords)+np.kron(ls,np.array([1,1]))
@@ -143,8 +168,19 @@ if __name__ == '__main__':
 
     
 
-    pos =  berrypposop(-1e-12, locmodes[modeindex,mcellindex].flatten(),latpos[:])
+    pos =  berrypposop(1e-12, locmodes[modeindex,mcellindex].flatten(),latpos[:])
     print(pos)
+
+
+    
+    polvec2 = nolocmodes[qpointindex,modeindex]
+    polvec2 = np.reshape(polvec2,(N,natoms))
+
+    norm2 = [np.linalg.norm(vec) for vec in polvec2.flatten()]
+    normalize = np.max(norm2)
+    polvec2 /= normalize
+    norm2 = [np.linalg.norm(vec) for vec in polvec2.flatten()]
+    polvec2 = polvec2.flatten()
     ################################
     #Plotting
     ################################
@@ -201,6 +237,17 @@ if __name__ == '__main__':
     ax5.set_title("Localized polarization vector, magnitude")
     ax5.set_xlabel('X')
     ax3.set_ylabel('Y')
+
+    fig6 = plt.figure()
+    ax6 = fig6.add_subplot()
+    
+    
+    ax6.scatter(latpos,np.zeros(len(latpos)),marker='o',linewidths=1)
+    ax6.quiver(latpos,np.zeros(len(latpos)), np.zeros(len(polvec2)),np.real(polvec2))
+    ax6.plot(latpos, norm2)
+    ax6.set_title("Polarization vector, real part")
+    ax6.set_xlabel('X')
+    ax6.set_ylabel('Y')
     
     plt.show()
     
