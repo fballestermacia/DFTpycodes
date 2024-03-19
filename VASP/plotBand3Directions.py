@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-from readKgrid import fromOUTCARtoplot
+from utilsVASP import fromOUTCARtoplot
 from get_effectiveMass_FiniteDiff import secondDer_FiniteDiff
 from numpy.polynomial.polynomial import polyfit, polyder, polyval
 
