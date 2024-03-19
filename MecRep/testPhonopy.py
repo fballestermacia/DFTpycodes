@@ -17,12 +17,14 @@ from phonopy.units import PwscfToTHz, VaspToTHz
 from phonopy.interface.qe import write_supercells_with_displacements
 
 factor = PwscfToTHz
-print(factor**2*0.284552630079000/30.973761)
+#print(factor**2*0.284552630079000/30.973761)
 
 cell, _ = read_pwscf(r'data/AgP2/Phonons/AgP2.scf.pwi')
 #print(cell)
 q2r = PH_Q2R(r'data/AgP2/Phonons/AgP2.fc')
+
 q2r.run(cell, is_full_fc=True)#, parse_fc=True)
+#print(q2r.primitive)
 q2r.write_force_constants(fc_format='text')
 
 

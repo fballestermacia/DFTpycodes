@@ -269,21 +269,88 @@ def orderedKgrid(kgrids):
 
 def readcellvec(scffile):
     """
-    Returns an array of vectors for the crystal and reciprocal axes of QE
+    Returns an array of vectors for the crystal and if present reciprocal axes of QE
     """
     cryst = []
     rec = []
+    recempty=True
+    incellpar = False
     filelines = [line for line in open(scffile) if line.strip]
     for line in filelines:
         try:
             line.split()[0]
         except IndexError:
             continue
+        if line.split()[0].upper() == 'CELL_PARAMETERS':
+            incellpar = True
+            units = line.split()[-1]
+            countvecs = 0
+            continue
+        if incellpar:
+            cryst.append([float(line.split()[0]),float(line.split()[1]),float(line.split()[2])])
+            countvecs += 1
+            if countvecs==3:
+                return np.array(cryst), units
+
+
         if line.split()[0] == 'a(1)' or line.split()[0] == 'a(2)' or line.split()[0] == 'a(3)':
             cryst.append([float(line.split()[3]),float(line.split()[4]),float(line.split()[5])])
         if line.split()[0] == 'b(1)' or line.split()[0] == 'b(2)' or line.split()[0] == 'b(3)':
             rec.append([float(line.split()[3]),float(line.split()[4]),float(line.split()[5])])
+            recempty = False
+    if recempty: return np.array(cryst)
     return np.array(cryst), np.array(rec)
+
+
+def readCrystal(scffile):
+    """
+    Returns an array of elements, theirs positions and masses. 
+    """
+    names = []
+    pos = []
+    mass = []
+    dummynames = []
+    dummymass = []
+    inspecies=False
+    inpos = False
+    filelines = [line for line in open(scffile) if line.strip]
+    for line in filelines:
+        try:
+            line.split()[0]
+        except IndexError:
+            continue
+
+        if line.split()[0].upper() == 'ATOMIC_SPECIES':
+            inspecies = True
+            continue
+        
+        if inspecies:
+            if len(line.split()[0]) > 2:
+                #print(line)
+                break
+            else:
+                dummynames.append(line.split()[0])
+                dummymass.append(float(line.split()[1]))
+    
+    for line in filelines:
+        try:
+            line.split()[0]
+        except IndexError:
+            continue
+
+        if line.split()[0].upper() == 'ATOMIC_POSITIONS':
+            inpos = True
+            continue
+        
+        if inpos:
+            if len(line.split()[0]) > 2:
+                break
+            names.append(line.split()[0])
+            pos.append([float(line.split()[1]),float(line.split()[2]),float(line.split()[3])])
+            
+            mass.append(dummymass[dummynames.index(line.split()[0])])
+                
+    return names, np.array(pos), np.array(mass)
 
 
 def readModesatKpoin(kpointvec, modesfile='matdyn.modes',scffile='scf.out'):
