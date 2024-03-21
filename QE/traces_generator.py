@@ -6,7 +6,7 @@ import ase.spacegroup as asespg
 from spgrep import get_spacegroup_irreps
 from spgrep.representation import get_character
 import utilsQE
-from cellconstructor.Methods import covariant_coordinates
+#from cellconstructor.Methods import covariant_coordinates
 import su2rot
 #np.set_printoptions(threshold=np.inf)
 
@@ -116,7 +116,7 @@ if __name__ == '__main__':
     
     factor = 0.123983
     
-    scf_file = r'data/AgP2/Phonons/AgP2.scf.pwi'
+    scf_file = r'data/232/AgP2.scf.pwi'
     structure = io.read(scf_file)
 
     basisvec = structure.get_cell()
@@ -137,8 +137,8 @@ if __name__ == '__main__':
 
     
     
-    qlabels, positions, qpoints = utilsQE.readHighSymPointsPhonon(r"data/AgP2/Phonons/matdyn.in", retKpoints=True)
-    notqpoints, bands = utilsQE.readPhononbandFreq(r"data/AgP2/Phonons/AgP2.freq.gp")
+    qlabels, positions, qpoints = utilsQE.readHighSymPointsPhonon(r"data/232/matdyn.in", retKpoints=True)
+    notqpoints, bands = utilsQE.readPhononbandFreq(r"data/232/AgP2.freq.gp")
     
 
     gammaindex = qpoints.index([0,0,0])
@@ -186,7 +186,7 @@ if __name__ == '__main__':
     atmposcov = atmpos#covariant_coordinates(basisvec[:],atmpos)
     #print(atmposcov)
 
-    with open(r"DFTpycodes/QE/testTRACESC.txt",'w') as f:
+    with open(r"DFTpycodes/QE/AgP2_232_TRACES.txt",'w') as f:
         f.write(str(len(bands))+'\n')
         f.write('0'+'\n')
         
@@ -215,7 +215,7 @@ if __name__ == '__main__':
             #mapping_little_group, rotationslgroup, translationslgroup = findlg(rotations, translations, symk[ik])
 
 
-            modes = utilsQE.readModesatKpoin(symk[ik],r'data/AgP2/Phonons/matdyn.modes', scffile=r'data/AgP2/Phonons/AgP2.scf.pwo')
+            modes = utilsQE.readModesatKpoin(symk[ik],r'data/232/matdyn.modes', scffile=r'data/232/AgP2.scf.pwo')
             
             '''for i, m in enumerate(modes):
                 for j, m2 in enumerate(modes):
