@@ -1,0 +1,138 @@
+&TB_FILE
+Hrfile = 'AgP2_phonopyTB_hr.dat'
+Particle = 'phonon'
+/
+
+&CONTROL
+!> bulk band structure calculation flag
+BulkBand_calc         = T
+SlabBand_calc         = T
+LOTO_correction       = F
+BulkFS_calc           = F
+BulkGap_cube_calc     = F
+BulkGap_plane_calc    = F
+Dos_calc              = F
+JDos_calc             = F
+WireBand_calc         = F
+SlabSS_calc           = F
+SlabArc_calc          = F
+SlabQPI_calc          = F
+Z2_3D_calc            = F
+SlabSpintexture_calc  = F
+Wanniercenter_calc    = F
+BerryPhase_calc       = F
+BerryCurvature_calc   = F
+EffectiveMass_calc    = F
+Chern_3D_calc         = F
+FindNodes_calc        = F
+WeylChirality_calc    = F
+/
+
+WEYL_CHIRALITY
+1          ! Num_Weyls
+Direct     ! Direct or Cartesian coordinate
+0.01       ! Radius of the ball surround a Weyl point
+0 0 0      ! Positions of Weyl points, No. of lines should larger than Num_weyls
+
+&SYSTEM
+NSLAB = 14
+NumOccupied = 1       ! NumOccupied
+SOC = 0               ! soc
+E_FERMI =0            ! e-fermi
+/
+
+&PARAMETERS
+Eta_Arc = 0.001    ! infinite small value, like brodening
+E_arc = 0          ! energy for calculate Fermi Arc
+OmegaNum = 500     ! omega number
+OmegaMin =  0      ! energy interval in unit of eV
+OmegaMax =  10     ! energy interval in unit of eV
+Nk1 = 26           ! number k points
+Nk2 = 26           ! number k points
+Nk3 = 26            ! number k points
+NP = 2             ! number of principle layers
+Gap_threshold = 0.001 ! threshold for GapCube output
+/
+
+KPLANE_SLAB
+-0.5 -0.5      ! Original point for 2D k plane
+1.0  0.0      ! The first vector to define 2D k plane
+0.0  1.0      ! The second vector to define 2D k plane  for arc plots
+
+KPLANE_BULK
+0.00  0.00  0.00   ! Original point for 3D k plane
+1.00  0.00  0.00   ! The first vector to define 3d k space plane
+0.00  1.00  0.00   ! The second vector to define 3d k space plane
+
+KCUBE_BULK
+0.00  0.00  0.00   ! Original point for 3D k plane
+1.00  0.00  0.00   ! The first vector to define 3d k space plane
+0.00  1.00  0.00   ! The second vector to define 3d k space plane
+0.00  0.00  1.00   ! The third vector to define 3d k cube
+
+LATTICE
+Angstrom
+6.13652861    0.0000000000000000    0.0000000000000000
+0.0000000000000000    5.01469927    0.0000000000000000
+-3.1079792    0.0000000000000000    7.09753791
+ATOM_POSITIONS
+12
+Direct                          ! Direct or Cartisen coordinate
+P   0.5915846800000000  0.9022746900000002  0.4181970499999999
+P   0.4084153200000000  0.4022746900000000  0.0818029500000000
+P   0.4084153200000000  0.0977253099999998  0.5818029500000002
+P   0.5915846800000000  0.5977253099999998  0.9181970500000000
+P   0.7279374300000003  0.2669563800000000  0.8028295900000001
+P   0.2720625699999996  0.7669563800000001  0.6971704100000000
+P   0.2720625699999996  0.7330436199999999  0.1971704099999999
+P   0.7279374300000003  0.2330436200000000  0.3028295899999999
+Ag   0.8598394300000003  0.5460093000000003  0.6010717200000002
+Ag   0.1401605699999997  0.0460093000000001  0.8989282799999998
+Ag   0.1401605699999997  0.4539906999999997  0.3989282799999997
+Ag   0.8598394300000003  0.9539906999999997  0.1010717200000002
+
+
+PROJECTORS
+3 3 3 3 3 3 3 3 3 3 3 3
+P px py pz
+P px py pz
+P px py pz
+P px py pz
+P px py pz
+P px py pz
+P px py pz
+P px py pz
+Ag px py pz
+Ag px py pz
+Ag px py pz
+Ag px py pz
+
+KPATH_BULK
+10
+E  0.500000  0.500000  0.500000     A  0.500000  0.000000  0.500000
+A  0.500000  0.000000  0.500000     G  0.000000  0.000000  0.000000
+G  0.000000  0.000000  0.000000     B  0.000000  0.000000  0.500000
+B  0.000000  0.000000  0.500000     D  0.000000  0.500000  0.500000
+D  0.000000  0.500000  0.500000     C  0.500000  0.500000  0.000000
+C  0.500000  0.500000  0.000000     Z  0.000000  0.500000  0.000000
+Z  0.000000  0.500000  0.000000     G  0.000000  0.000000  0.000000
+G  0.000000  0.000000  0.000000     Y  0.500000  0.000000  0.000000
+Y  0.500000  0.000000  0.000000     C  0.500000  0.500000  0.000000
+C  0.500000  0.500000  0.000000     E  0.500000  0.500000  0.500000
+
+
+ATOM_MASS
+2
+8 4
+30.973762 107.8682
+
+SURFACE
+1 0 0
+0 1 0
+KPATH_SLAB
+5
+G 0.0 0.0 X 0.5 0.0
+X 0.5 0.0 M 0.5 0.5
+M 0.5 0.5 Y 0.0 0.5
+Y 0.0 0.5 G 0.0 0.0
+G 0.0 0.0 M 0.5 0.5
