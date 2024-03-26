@@ -3,15 +3,15 @@ import matplotlib.pyplot as plt
 import utilsQE
 
 
-factor = 0.123983
-qpoints, bands = utilsQE.readPhononbandFreq(r"data/AgP2/Phonons/AgP2.freq.gp")
+factor = 0.123983#*0.24180
+qpoints, bands = utilsQE.readPhononbandFreq(r"data/232/AgP2.freq.gp")
 
-qlabels, positions = utilsQE.readHighSymPointsPhonon(r"data/AgP2/Phonons/matdyn.in")
+qlabels, positions = utilsQE.readHighSymPointsPhonon(r"data/232/matdyn.in")
 
 bands *= factor
 
 plt.figure()
-topocolors = 'g'*10+'g'*4+'k'*12+'g'*6+'k'*4
+topocolors = 'k'*36#'g'*10+'g'*4+'k'*12+'g'*6+'k'*4
 
 
 for i,band in enumerate(bands):
