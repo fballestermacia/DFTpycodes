@@ -10,7 +10,7 @@ set ylabel font ",24"
 set ylabel offset 1.5,0
 set xrange [0:    5.90622]
 emin=   -0.500000
-emax=   14.696096
+emax=   14.712324
 set yrange [0: emax]
 set ylabel "Frequency (THz)"
 set xtics ("E  "    0.00000,"A  "    0.62648,"G  "    1.46715,"B  "    1.90978,"D  "    2.53626,"C  "    3.09287,"Z  "    3.65175,"G  "    4.27822,"Y  "    4.83711,"C  "    5.46358,"E  "    5.90622)

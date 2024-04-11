@@ -14,4 +14,4 @@ set ylabel "WCC"
 set ylabel offset 0, 0.0 
 set xrange [0: 0.5]
 set yrange [0:1]
-plot for [i=4:    11] 'wcc.dat' u 1:i w p  pt 7  ps 1.1 lc 'red'
+plot for [i=4:    14] 'wcc.dat' u 1:i w p  pt 7  ps 1.1 lc 'red'

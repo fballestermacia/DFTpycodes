@@ -6,7 +6,7 @@ Package = 'QE'
 
 &CONTROL
 !> bulk band structure calculation flag
-BulkBand_calc         = F !T
+BulkBand_calc         = T !T
 SlabBand_calc         = F !T
 LOTO_correction       = F !F
 BulkFS_calc           = F !T
@@ -20,7 +20,7 @@ SlabArc_calc          = F
 SlabQPI_calc          = F
 Z2_3D_calc            = F
 SlabSpintexture_calc  = F
-Wanniercenter_calc    = T !T
+Wanniercenter_calc    = F !T
 BerryPhase_calc       = F
 BerryCurvature_calc   = F
 EffectiveMass_calc    = F
@@ -59,7 +59,7 @@ Direct     ! Direct or Cartesian coordinate
 
 &SYSTEM
 NSLAB = 14
-NumOccupied = 8       ! NumOccupied
+NumOccupied = 11      ! NumOccupied
 SOC = 0               ! soc
 E_FERMI =0            ! e-fermi
 Bmagnitude = 0 
@@ -69,16 +69,16 @@ Bz= 0     ! Bx By Bz
 /
 
 &PARAMETERS
-Eta_Arc = 0.00001    ! infinite small value, like brodening
-E_arc = 0.00001          ! energy for calculate Fermi Arc
-OmegaNum = 200     ! omega number
-OmegaMin =  0      ! energy interval in unit of eV
-OmegaMax =  1     ! energy interval in unit of eV
-Nk1 = 5           ! number k points
-Nk2 = 5           ! number k points
-Nk3 = 5            ! number k points
+Eta_Arc = 0.001    ! infinite small value, like brodening
+E_arc = 10        ! energy for calculate Fermi Arc
+OmegaNum = 800     ! omega number
+OmegaMin =  -1      ! energy interval in unit of eV
+OmegaMax =  10     ! energy interval in unit of eV
+Nk1 = 255           ! number k points
+Nk2 = 25           ! number k points
+Nk3 = 12            ! number k points
 NP = 50             ! number of principle layers
-Gap_threshold = 0.01 ! threshold for GapCube output
+Gap_threshold = 0.000001 ! threshold for GapCube output
 Tmin = 0
 Tmax = 0
 /
@@ -90,8 +90,8 @@ KPLANE_SLAB
 
 KPLANE_BULK
 0.00  0.00  0.00   ! Original point for 3D k plane
-1.00  0.00  0.00   ! The first vector to define 3d k space plane
-0.00  1.00  0.00   ! The second vector to define 3d k space plane
+0.00  1.00  0.00   ! The first vector to define 3d k space plane
+1.00  0.00  0.00   ! The second vector to define 3d k space plane
 
 KCUBE_BULK
 0.00  0.00  0.00   ! Original point for 3D k plane
