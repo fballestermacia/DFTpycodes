@@ -96,7 +96,7 @@ def s2p(spos, cell, p2s):
     p2s_positions = frac_pos[p2s]
     s2p_map = []
     for s_pos in frac_pos:
-        # Compute distances from s_pos to all positions in _p2s_map.
+        # Compute distances from spos to all positions in pos.
         frac_diffs = p2s_positions - s_pos
         frac_diffs -= np.rint(frac_diffs)
         cart_diffs = np.dot(frac_diffs, cell)
@@ -228,9 +228,10 @@ if __name__ == '__main__':
 
     # Read files and define some constant variables
     dyn = CC.Phonons.Phonons()
-    dyn.LoadFromQE(fildyn_prefix="data/AgP2/Phonons/dynmats/AgP2.dyn", nqirr=30)
+    dyn.LoadFromQE(fildyn_prefix="data/AgP2/Phonons/444/dynmats/AgP2.dyn", nqirr=30)
 
-    #dyn.InterpolateMesh([10,10,10])
+    #dyn.InterpolateMesh([1,1,1])
+    #dyn.Symmetrize(verbose=True, asr='custom', use_spglib=False)
 
     super_dyn = dyn.GenerateSupercellDyn(dyn.GetSupercell())
     num_atom = int(len(dyn.structure.coords))
@@ -256,7 +257,7 @@ if __name__ == '__main__':
     svecs, multi = smallest_vectors(
         CC.Methods.covariant_coordinates(scell, super_dyn.structure.coords),
         CC.Methods.covariant_coordinates(scell, super_dyn.structure.coords),
-        scell #scell
+        scell 
         )
     print("Done!")
     

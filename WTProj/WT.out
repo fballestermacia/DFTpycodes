@@ -126,18 +126,18 @@
    
  >>>calculation parameters : 
  E_arc :         10.00000
- Eta_arc :          0.00100
+ Eta_arc :          0.10000
  Gap_threshold         0.00000
  OmegaMin :         -1.00000
  OmegaMax :         10.00000
- OmegaNum :    800
+ OmegaNum :   8000
  OmegaNum_unfold :    200
- Nk1 :    255
+ Nk1 :     75
  Nk2 :     25
  Nk3 :     12
- NP number of principle layers  :     50
+ NP number of principle layers  :      1
  Tmin(Kelvin)  :          0.00000
- Tmax(Kelvin)  :          0.00000
+ Tmax(Kelvin)  :        100.00000
  NumT  :      1
  NBTau  :      1
  Beta  :        100.00000
@@ -598,10 +598,10 @@ Born_Charge for atom  12  Ag4
   << Read Hmn_R.data successfully
   
  >> Start of calculating bulk band
- Time cost for BulkBand is about            1.650 s
+ Time cost for BulkBand is about            0.489 s
  << End of calculating bulk band
   
- Time cost for whole program is about            1.952 s
+ Time cost for whole program is about            0.782 s
   
   
   =======================================================================
