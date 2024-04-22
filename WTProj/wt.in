@@ -69,18 +69,18 @@ Bz= 0     ! Bx By Bz
 /
 
 &PARAMETERS
-Eta_Arc = 0.001    ! infinite small value, like brodening
+Eta_Arc = 0.1    ! infinite small value, like brodening
 E_arc = 10        ! energy for calculate Fermi Arc
-OmegaNum = 800     ! omega number
+OmegaNum = 8000     ! omega number
 OmegaMin =  -1      ! energy interval in unit of eV
 OmegaMax =  10     ! energy interval in unit of eV
-Nk1 = 255           ! number k points
+Nk1 = 75           ! number k points
 Nk2 = 25           ! number k points
 Nk3 = 12            ! number k points
-NP = 50             ! number of principle layers
+NP = 1             ! number of principle layers
 Gap_threshold = 0.000001 ! threshold for GapCube output
 Tmin = 0
-Tmax = 0
+Tmax = 100
 /
 
 KPLANE_SLAB
