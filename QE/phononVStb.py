@@ -42,15 +42,15 @@ def readpathbulkeks(pathlabels,bulkekfile = 'bulkek.dat'):
 
 factor = 0.123983#*0.24180
 thztomev = 4.15665538536
-qpoints, bands = utilsQE.readPhononbandFreq(r"data/AgP2/Phonons/AgP2.freq.gp")
+qpoints, bands = utilsQE.readPhononbandFreq(r"QE_projects\AgP2\phonons\444\AgP2.newHSP.freq.gp")
 
-qlabels, positions = utilsQE.readHighSymPointsPhonon(r"data/AgP2/Phonons/matdyn.in")
+qlabels, positions = utilsQE.readHighSymPointsPhonon(r"QE_projects\AgP2\phonons\444\matdyn.newHSP.in")
 
 
 bands *= factor
 
 
-tbqs, tbbandsperline = readpathbulkeks(qlabels, 'DFTpycodes/WTProj/bulkek.dat')
+tbqs, tbbandsperline = readpathbulkeks(qlabels, 'DFTpycodes\\WTProj\\bulkek.dat')
 
 tbbandsperline *= thztomev
 
