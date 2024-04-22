@@ -1,0 +1,15 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+python module su2rot ! in 
+    interface  ! in :su2rot
+        subroutine get_su2rotation(r,su2) ! in :su2rot:su2rot.f90
+            real*8 dimension(3,3),intent(in) :: r
+            complex dimension(2,2),intent(out) :: su2
+        end subroutine get_su2rotation
+    end interface 
+end python module su2rot
+
+! This file was auto-generated with f2py (version:1.26.1).
+! See:
+! https://web.archive.org/web/20140822061353/http://cens.ioc.ee/projects/f2py2e
