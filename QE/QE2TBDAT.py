@@ -12,9 +12,10 @@ import numpy as np
 import cellconstructor as CC
 import cellconstructor.Phonons
 from cellconstructor.Units import MASS_RY_TO_UMA
+import sys
 
 
-def smallest_vectors(spos, pos, sbasis, symprec=1e-8):
+def smallest_vectors(spos, pos, sbasis, symprec=1e-12):
 
     snatoms = len(spos)
     natoms = len(pos)
@@ -90,7 +91,7 @@ def s2p(spos, cell, p2s):
     '''
     Again, not originally my code, but modified for my purposes
     '''
-    symprec = 1e-5
+    symprec = 1e-12
     frac_pos = spos
 
     p2s_positions = frac_pos[p2s]
@@ -225,15 +226,26 @@ if __name__ == '__main__':
     # Constant to get the correct units
     factor = 108.97077184367376 #PwscfToTHz
 
+    # Handle inputs from terminal
+
+    dynprefix = str(sys.argv[1])
+    nqirrs = int(sys.argv[2])
+
+    prefix = dynprefix.split('.dyn')[0]
+    
 
     # Read files and define some constant variables
     dyn = CC.Phonons.Phonons()
-    dyn.LoadFromQE(fildyn_prefix="data/AgP2/Phonons/444/dynmats/AgP2.dyn", nqirr=30)
+    dyn.LoadFromQE(fildyn_prefix=dynprefix, nqirr=nqirrs)
 
     #dyn.InterpolateMesh([1,1,1])
     #dyn.Symmetrize(verbose=True, asr='custom', use_spglib=False)
 
     super_dyn = dyn.GenerateSupercellDyn(dyn.GetSupercell())
+
+    print(dyn.dielectric_tensor)
+    print(dyn.effective_charges)
+
     num_atom = int(len(dyn.structure.coords))
     num_satom = int(len(super_dyn.structure.coords))
 
@@ -274,7 +286,7 @@ if __name__ == '__main__':
             num_satom,
             num_atom,
             cell,
-            'DFTpycodes/WTProj/AgP2_phonopyTB_hr.dat'
+            '{}_phononTB_hr.dat'.format(prefix)
         )
 
     print("Finished writing the Tight Binding file!")

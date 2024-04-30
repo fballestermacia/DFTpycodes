@@ -28,8 +28,16 @@ def readpathbulkeks(pathlabels,bulkekfile = 'bulkek.dat'):
     segments = []
     bandspersegment = []
     for i in range(len(pathlabels)-1):
-        a = pathlabels[i].split('$')[1].split('_')[0]
-        b = pathlabels[i+1].split('$')[1].split('_')[0]
+        a = pathlabels[i].split('$')[1].split('_')
+        b = pathlabels[i+1].split('$')[1].split('_')
+        if len(a)>1:
+            a = a[0] + a[1]
+        else:
+            a = a[0]
+        if len(b)>1:
+            b = b[0] + b[1]
+        else:
+            b = b[0]
         if a == '\\Gamma':
             a = 'G'
         if b == '\\Gamma':
@@ -91,7 +99,7 @@ plt.legend(handles, labels, loc = 'best')
 plt.ylabel("Frequency (meV)" )#(cm$^{-1}$)")
 plt.xlim(qpoints[0], qpoints[-1])
 
-plt.title('AgP$_2$ phonon bands')
+plt.title('phonon bands')
 
 #plt.ylim(0, )
 plt.show()

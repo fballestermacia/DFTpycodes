@@ -1,5 +1,5 @@
 &TB_FILE
-Hrfile = 'AgP2_phonopyTB_hr.dat'
+Hrfile = 'AgP2_phononTB_hr.dat'
 Particle = 'phonon'
 Package = 'QE'
 /

@@ -24,7 +24,7 @@
  You are using : TB     model
  Tight-binding Hamiltonian FROM: Hr File
  Is_Sparse_Hr=  F
- Tight-binding Hamiltonian filename: AgP2_phonopyTB_hr.dat    
+ Tight-binding Hamiltonian filename: AgP2_phononTB_hr.dat     
  System of particle: phonon                   
  Tight-binding Hamiltonian obtained from : QE                       
    
@@ -587,7 +587,7 @@ Born_Charge for atom  12  Ag4
      0.02925    -0.09012     0.45371
  <<<Read wt.in file successfully
  
-  File AgP2_phonopyTB_hr.dat exist, We are using HmnR from wannier90
+  File AgP2_phononTB_hr.dat exist, We are using HmnR from wannier90
  >> Num_wann          36
  >> NRPTS         125
   >> Begin to read Hmn_R.data
@@ -598,10 +598,10 @@ Born_Charge for atom  12  Ag4
   << Read Hmn_R.data successfully
   
  >> Start of calculating bulk band
- Time cost for BulkBand is about            0.489 s
+ Time cost for BulkBand is about            0.488 s
  << End of calculating bulk band
   
- Time cost for whole program is about            0.782 s
+ Time cost for whole program is about            0.777 s
   
   
   =======================================================================
