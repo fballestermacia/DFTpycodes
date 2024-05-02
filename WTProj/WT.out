@@ -371,12 +371,12 @@ Number of K lines :    10
  A      0.5000   0.0000   0.5000  G       0.0000   0.0000   0.0000
  G      0.0000   0.0000   0.0000  B       0.0000   0.0000   0.5000
  B      0.0000   0.0000   0.5000  D       0.0000   0.5000   0.5000
- D      0.0000   0.5000   0.5000  C       0.5000   0.5000   0.0000
- C      0.5000   0.5000   0.0000  Z       0.0000   0.5000   0.0000
+ D      0.0000   0.5000   0.5000  C2      0.5000   0.5000   0.0000
+ C2     0.5000   0.5000   0.0000  Z       0.0000   0.5000   0.0000
  Z      0.0000   0.5000   0.0000  G       0.0000   0.0000   0.0000
- G      0.0000   0.0000   0.0000  Y       0.5000   0.0000   0.0000
- Y      0.5000   0.0000   0.0000  C       0.5000   0.5000   0.0000
- C      0.5000   0.5000   0.0000  E       0.5000   0.5000   0.5000
+ G      0.0000   0.0000   0.0000  Y2      0.5000   0.0000   0.0000
+ Y2     0.5000   0.0000   0.0000  C2      0.5000   0.5000   0.0000
+ C2     0.5000   0.5000   0.0000  E       0.5000   0.5000   0.5000
   
  We found KPATH_SLAB card
  k lines for 2D system
@@ -598,10 +598,10 @@ Born_Charge for atom  12  Ag4
   << Read Hmn_R.data successfully
   
  >> Start of calculating bulk band
- Time cost for BulkBand is about            0.488 s
+ Time cost for BulkBand is about            0.566 s
  << End of calculating bulk band
   
- Time cost for whole program is about            0.777 s
+ Time cost for whole program is about            0.897 s
   
   
   =======================================================================

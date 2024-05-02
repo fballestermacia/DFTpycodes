@@ -13,7 +13,7 @@ emin=   -0.500000
 emax=   14.712297
 set yrange [0: emax]
 set ylabel "Frequency (THz)"
-set xtics ("E  "    0.00000,"A  "    0.62648,"G  "    1.46715,"B  "    1.90978,"D  "    2.53626,"C  "    3.09287,"Z  "    3.65175,"G  "    4.27822,"Y  "    4.83711,"C  "    5.46358,"E  "    5.90622)
+set xtics ("E  "    0.00000,"A  "    0.62648,"G  "    1.46715,"B  "    1.90978,"D  "    2.53626,"C2 "    3.09287,"Z  "    3.65175,"G  "    4.27822,"Y2 "    4.83711,"C2 "    5.46358,"E  "    5.90622)
 set arrow from    0.62648,  0.0 to    0.62648, emax nohead
 set arrow from    1.46715,  0.0 to    1.46715, emax nohead
 set arrow from    1.90978,  0.0 to    1.90978, emax nohead
