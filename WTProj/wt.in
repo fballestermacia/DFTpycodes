@@ -15,8 +15,8 @@ BulkGap_plane_calc    = F
 Dos_calc              = F
 JDos_calc             = F
 WireBand_calc         = F
-SlabSS_calc           = F
-SlabArc_calc          = F
+SlabSS_calc           = F !T
+SlabArc_calc          = F !T
 SlabQPI_calc          = F
 Z2_3D_calc            = F
 SlabSpintexture_calc  = F
@@ -59,7 +59,7 @@ Direct     ! Direct or Cartesian coordinate
 
 &SYSTEM
 NSLAB = 14
-NumOccupied = 11      ! NumOccupied
+NumOccupied = 10      ! NumOccupied
 SOC = 0               ! soc
 E_FERMI =0            ! e-fermi
 Bmagnitude = 0 
@@ -69,32 +69,32 @@ Bz= 0     ! Bx By Bz
 /
 
 &PARAMETERS
-Eta_Arc = 0.1    ! infinite small value, like brodening
-E_arc = 10        ! energy for calculate Fermi Arc
-OmegaNum = 8000     ! omega number
-OmegaMin =  -1      ! energy interval in unit of eV
-OmegaMax =  10     ! energy interval in unit of eV
-Nk1 = 75           ! number k points
-Nk2 = 25           ! number k points
+Eta_Arc = 0.5    ! infinite small value, like brodening
+E_arc = 106        ! energy for calculate Fermi Arc
+OmegaNum = 50     ! omega number
+OmegaMin =  100      ! energy interval in unit of eV
+OmegaMax =  110     ! energy interval in unit of eV
+Nk1 = 120           ! number k points
+Nk2 = 120           ! number k points
 Nk3 = 12            ! number k points
-NP = 1             ! number of principle layers
-Gap_threshold = 0.000001 ! threshold for GapCube output
+NP = 2             ! number of principle layers
+Gap_threshold = 0.0001 ! threshold for GapCube output
 Tmin = 0
 Tmax = 100
 /
 
 KPLANE_SLAB
--0.5 -0.5      ! Original point for 2D k plane
+-0.5  -0.5      ! Original point for 2D k plane
 1.0  0.0      ! The first vector to define 2D k plane
 0.0  1.0      ! The second vector to define 2D k plane  for arc plots
 
 KPLANE_BULK
 0.00  0.00  0.00   ! Original point for 3D k plane
-0.00  1.00  0.00   ! The first vector to define 3d k space plane
-1.00  0.00  0.00   ! The second vector to define 3d k space plane
+0.00  0.00  1.00   ! The first vector to define 3d k space plane
+0.00  1.00  0.00   ! The second vector to define 3d k space plane
 
 KCUBE_BULK
-0.00  0.00  0.00   ! Original point for 3D k plane
+-0.50  -0.50  -0.50   ! Original point for 3D k plane
 1.00  0.00  0.00   ! The first vector to define 3d k space plane
 0.00  1.00  0.00   ! The second vector to define 3d k space plane
 0.00  0.00  1.00   ! The third vector to define 3d k cube

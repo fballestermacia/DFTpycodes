@@ -38,9 +38,9 @@ def readpathbulkeks(pathlabels,bulkekfile = 'bulkek.dat'):
             b = b[0] + b[1]
         else:
             b = b[0]
-        if a == '\\Gamma':
+        if a == '\\Gamma' or a == 'Gamma' or a.lower() == 'gamma':
             a = 'G'
-        if b == '\\Gamma':
+        if b == '\\Gamma' or b == 'Gamma' or b.lower() == 'gamma':
             b = 'G'
         seg, bands = readbulkek(bulkekfile=bulkekfile + '-' + a +'-' +b, linestart=3)
         segments.append(seg)

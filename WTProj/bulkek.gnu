@@ -1,4 +1,4 @@
-set terminal pdf enhanced color font ",30"
+set terminal pdf enhanced color font ",24"
 set palette defined ( 0  "green", 5 "yellow", 10 "red" )
 set output 'bulkek.pdf' 
 set style data linespoints
@@ -6,11 +6,11 @@ unset key
 set pointsize 0.8
 #set xtics font ",24"
 #set ytics font ",24"
-set ylabel font ",24"
-set ylabel offset 1.5,0
+#set ylabel font ",24"
+set ylabel offset 0.5,0
 set xrange [0:    5.90622]
 emin=   -0.500000
-emax=   14.712297
+emax=   14.712325
 set yrange [0: emax]
 set ylabel "Frequency (THz)"
 set xtics ("E  "    0.00000,"A  "    0.62648,"G  "    1.46715,"B  "    1.90978,"D  "    2.53626,"C2 "    3.09287,"Z  "    3.65175,"G  "    4.27822,"Y2 "    4.83711,"C2 "    5.46358,"E  "    5.90622)
