@@ -68,7 +68,7 @@
  SHC_calc                          :  F
  Boltz_OHE_calc                    :  F
  Boltz_Berry_correction            :  F
- LOTO_correction                   :  F
+ LOTO_correction                   :  T
  OrbitalTexture_calc               :  F
  OrbitalTexture_3D_calc            :  F
  LandauLevel_k_calc                :  F
@@ -138,7 +138,7 @@
  OmegaMax :        110.00000
  OmegaNum :     50
  OmegaNum_unfold :    200
- Nk1 :    120
+ Nk1 :     35
  Nk2 :    120
  Nk3 :     12
  NP number of principle layers  :      2
@@ -597,7 +597,7 @@ Born_Charge for atom  12  Ag4
  Time cost for readinput is about            0.005 s
   
  >> We finished the symmetry reducing of the kpoints in the kcube
-  Number of kpoints mesh is     172800
+  Number of kpoints mesh is      50400
   Number of symmetry reduced kpoints is          0
   
  Time cost for symmetry is about            0.000 s
@@ -688,10 +688,10 @@ Born_Charge for atom  12  Ag4
   << Read Hmn_R.data successfully
   
  >> Start of calculating bulk band
- Time cost for BulkBand is about            0.662 s
+ Time cost for BulkBand is about            0.319 s
  << End of calculating bulk band
   
- Time cost for whole program is about            0.972 s
+ Time cost for whole program is about            0.626 s
   
   
   =======================================================================

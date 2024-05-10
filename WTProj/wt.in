@@ -8,7 +8,7 @@ Package = 'QE'
 !> bulk band structure calculation flag
 BulkBand_calc         = T !T
 SlabBand_calc         = F !T
-LOTO_correction       = F !F
+LOTO_correction       = T !F
 BulkFS_calc           = F !T
 BulkGap_cube_calc     = F
 BulkGap_plane_calc    = F
@@ -74,7 +74,7 @@ E_arc = 106        ! energy for calculate Fermi Arc
 OmegaNum = 50     ! omega number
 OmegaMin =  100      ! energy interval in unit of eV
 OmegaMax =  110     ! energy interval in unit of eV
-Nk1 = 120           ! number k points
+Nk1 = 35           ! number k points
 Nk2 = 120           ! number k points
 Nk3 = 12            ! number k points
 NP = 2             ! number of principle layers

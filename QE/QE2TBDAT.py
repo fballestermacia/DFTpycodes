@@ -14,6 +14,26 @@ import cellconstructor.Phonons
 from cellconstructor.Units import MASS_RY_TO_UMA
 import sys
 
+def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 10, fill = '█', printEnd = "\r"):
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        length      - Optional  : character length of bar (Int)
+        fill        - Optional  : bar fill character (Str)
+        printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
+    """
+    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    filledLength = int(length * iteration // total)
+    bar = fill * filledLength + '-' * (length - filledLength)
+    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end = printEnd)
+    # Print New Line on Complete
+    if iteration == total: 
+        print()
 
 def smallest_vectors(spos, pos, sbasis, symprec=1e-12):
 
@@ -55,6 +75,9 @@ def smallest_vectors(spos, pos, sbasis, symprec=1e-12):
     npoints = len(lattice_points)
     vecs = np.empty((npoints,3))
     #print(lattice_points)
+    totiter = snatoms*natoms
+    barcounter = 0
+    printProgressBar(barcounter,totiter)
     for i in range(snatoms):
         for j in range(natoms):
             length = np.empty(npoints)
@@ -76,8 +99,10 @@ def smallest_vectors(spos, pos, sbasis, symprec=1e-12):
                     transformedvec = CC.Methods.covariant_coordinates(np.linalg.inv(sbasis), vecs[k])#np.matmul(sbasis,vecs[k])
                     smallestvectors[i,j,count,:] = transformedvec
                     count += 1
+            barcounter += 1
+            printProgressBar(barcounter,totiter)
             if count > 27:
-                print("As Eminem said: 'something's wrong'")
+                print("Something's wrong in the crystal structure")
                 return None, None
             else: 
                 multi[i,j] = count
@@ -228,8 +253,21 @@ if __name__ == '__main__':
 
     # Handle inputs from terminal
 
-    dynprefix = str(sys.argv[1])
-    nqirrs = int(sys.argv[2])
+    try:
+        dynprefix = str(sys.argv[1])
+    except IndexError:
+        raise IndexError('Missing file name name.dyn. Usage: \'python QE2TBDAT.py name.dyn N_irr_q [ASR], []=optioinal \'')
+
+    try:
+        nqirrs = int(sys.argv[2])
+    except IndexError:
+        raise IndexError('Missing number of irreducible q points N_irr_q. Usage: \'python QE2TBDAT.py name.dyn N_irr_q [ASR], []=optioinal \'')
+
+    try:
+        asr = str(sys.argv[3])
+        symmetrize = True
+    except IndexError:
+        symmetrize = False
 
     prefix = dynprefix.split('.dyn')[0]
     
@@ -239,12 +277,13 @@ if __name__ == '__main__':
     dyn.LoadFromQE(fildyn_prefix=dynprefix, nqirr=nqirrs)
 
     #dyn.InterpolateMesh([1,1,1])
-    #dyn.Symmetrize(verbose=True, asr='custom', use_spglib=False)
+    if symmetrize:
+        dyn.Symmetrize(verbose=False, asr=asr, use_spglib=False)
 
     super_dyn = dyn.GenerateSupercellDyn(dyn.GetSupercell())
 
-    print(dyn.dielectric_tensor)
-    print(dyn.effective_charges)
+    #print(dyn.dielectric_tensor)
+    #print(dyn.effective_charges)
 
     num_atom = int(len(dyn.structure.coords))
     num_satom = int(len(super_dyn.structure.coords))
