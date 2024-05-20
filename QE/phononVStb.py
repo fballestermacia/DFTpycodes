@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import utilsQE
+import cellconstructor as CC, cellconstructor.Phonons
+import cellconstructor.ForceTensor
 
 def readbulkek(bulkekfile = 'bulkek.dat', linestart = 2):
     filelines = [line for line in open(bulkekfile) if line.strip()]
@@ -47,9 +49,26 @@ def readpathbulkeks(pathlabels,bulkekfile = 'bulkek.dat'):
         bandspersegment.append(bands)
     return np.array(segments), np.array(bandspersegment)
 
-
 factor = 0.123983#*0.24180
 thztomev = 4.15665538536
+
+# Let us define the PATH in the brilluin zone and the total number of points
+PATH = "EAGBDCZGYCE"
+N_POINTS = 1000
+# Here we define the position of the special points
+SPECIAL_POINTS = {"G": [0,0,0],"E": [.5, .5, .5],"A": [.5, 0, .5],"B": [0, 0, .5],"D": [0, .5, .5],"C": [.5, .5, 0],"Z": [0, .5, 0],"Y": [.5, 0, 0]}
+
+SSCHA_DYN = 'data/AgP2/Phonons/444/dynmats/AgP2.dyn'
+NQIRR2 = 30
+
+sscha_dyn = CC.Phonons.Phonons(SSCHA_DYN, NQIRR2)
+qpath, data = CC.Methods.get_bandpath(sscha_dyn.structure.unit_cell,PATH,SPECIAL_POINTS,N_POINTS)
+xaxis, xticks, xlabels = data # Info to plot correclty the x axis
+sscha_dispersion = CC.ForceTensor.get_phonons_in_qpath(sscha_dyn, qpath)*factor
+nmodes = sscha_dyn.structure.N_atoms * 3
+
+
+
 qpoints, bands = utilsQE.readPhononbandFreq(r"data/AgP2/Phonons/444/AgP2.newHSP.freq.gp")
 
 qlabels, positions = utilsQE.readHighSymPointsPhonon(r"data/AgP2/Phonons/444/matdyn.newHSP.in")
@@ -68,33 +87,55 @@ tbbandsperline *= thztomev
 for i in range(len(positions)-1):
     tbqs[i] = tbqs[i]*(qpoints[positions[i+1]]-qpoints[positions[i]])/tbqs[i,-1] + qpoints[positions[i]]
 
+newxaxis = np.array([])
 
+for i in range(len(positions)-1):
+    if i == 0:
+        mask = ((xaxis[:]>=xticks[i]) & (xaxis[:]<=xticks[i+1]))
+        xmasked = xaxis[mask]
+        prevmask = xmasked
+        newxaxis = np.append(newxaxis,np.array(((xmasked-xmasked[0])/(xmasked[-1]-xmasked[0]))*(qpoints[positions[i+1]]-qpoints[positions[i]]) + qpoints[positions[i]]).flatten())
+        
+    else: 
+        mask = ((xaxis[:]>xticks[i]) & (xaxis[:]<=xticks[i+1]))
+        xmasked = np.append(prevmask[-1],xaxis[mask])
+        prevmask = xmasked
+        newpoints = (xmasked-xmasked[0])/(xmasked[-1]-xmasked[0])*(qpoints[positions[i+1]]-qpoints[positions[i]]) + qpoints[positions[i]]
+        newxaxis = np.append(newxaxis,np.array(newpoints).flatten()[1:])
+        
+    newxaxis = np.array(newxaxis).flatten()
+    #xaxis2[i] = xaxis2[i]*(qpoints[positions[i+1]]-qpoints[positions[i]])/xaxis2[i,-1] + qpoints[positions[i]]
+
+xaxis = np.array(newxaxis).flatten()
 
 
 plt.figure()
 topocolors = 'k'*36#'g'*10+'g'*4+'k'*12+'g'*6+'k'*4
-
+ax1 = plt.axes()
 
 for i,band in enumerate(bands):
-    plt.plot(qpoints, band, linewidth=1, alpha=1, color=topocolors[i], label='QE')
+    ax1.plot(qpoints, band, linewidth=1, alpha=1, color=topocolors[i], label='QE')
 
 
 for i, tbands in enumerate(tbbandsperline):
     for j, tband in enumerate(tbands):
-        plt.plot(tbqs[i], tband,linewidth = 1, alpha = 1, color = 'r', label='WannierTools')
+        ax1.plot(tbqs[i], tband,linewidth = 1, alpha = 1, color = 'r', label='WannierTools')
 
 for pos in positions:
-    plt.axvline(x=qpoints[pos], linewidth=0.5, color='k')
+    ax1.axvline(x=qpoints[pos], linewidth=0.5, color='k')
+
+for i in range(nmodes):
+    ax1.plot(xaxis, sscha_dispersion[:,i], color = 'g', label = 'cellconstructor', linestyle='-.')
 
 plt.xticks(ticks=qpoints[positions[:]], labels=qlabels)
 
-plt.axhline(y=0, linewidth=0.5, color='b', linestyle='--')
+ax1.axhline(y=0, linewidth=0.5, color='b', linestyle='--')
 
 handles, labels = plt.gca().get_legend_handles_labels()
 labels, ids = np.unique(labels, return_index=True)
 handles = [handles[i] for i in ids]
 
-plt.legend(handles, labels, loc = 'best')
+ax1.legend(handles, labels, loc = 'best')
 
 plt.ylabel("Frequency (meV)" )#(cm$^{-1}$)")
 plt.xlim(qpoints[0], qpoints[-1])

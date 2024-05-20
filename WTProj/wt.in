@@ -74,7 +74,7 @@ E_arc = 106        ! energy for calculate Fermi Arc
 OmegaNum = 50     ! omega number
 OmegaMin =  100      ! energy interval in unit of eV
 OmegaMax =  110     ! energy interval in unit of eV
-Nk1 = 35           ! number k points
+Nk1 = 350           ! number k points
 Nk2 = 120           ! number k points
 Nk3 = 12            ! number k points
 NP = 2             ! number of principle layers
@@ -161,6 +161,7 @@ Y2  0.500000  0.000000  0.000000     C2  0.500000  0.500000  0.000000
 C2  0.500000  0.500000  0.000000     E  0.500000  0.500000  0.500000
 
 LOTO_DT
+4 4 4
 14.581365186034 0.000000000000 -0.043974208398
 0.000000000000 6.886030085015 0.000000000000
 -0.043974202790 0.000000000000 15.585646201405
