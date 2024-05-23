@@ -594,7 +594,7 @@ Born_Charge for atom  12  Ag4
     -0.44122     0.50323    -0.22140
      0.02925    -0.09012     0.45371
  <<<Read wt.in file successfully
- Time cost for readinput is about            0.020 s
+ Time cost for readinput is about            0.012 s
   
  >> We finished the symmetry reducing of the kpoints in the kcube
   Number of kpoints mesh is     504000
@@ -688,10 +688,10 @@ Born_Charge for atom  12  Ag4
   << Read Hmn_R.data successfully
   
  >> Start of calculating bulk band
- Time cost for BulkBand is about            3.106 s
+ Time cost for BulkBand is about            3.003 s
  << End of calculating bulk band
   
- Time cost for whole program is about            3.431 s
+ Time cost for whole program is about            3.317 s
   
   
   =======================================================================

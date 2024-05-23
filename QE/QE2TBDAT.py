@@ -1,8 +1,17 @@
 """
-This code generates an output file 'prefixTB_hr.dat' which is an input of wannier90/wanniertools.
-Inputs are output files from Quantum Espresso. Mainly the 'prefix.dat{0,1,2,...}' files, which are read and parsed using SSCHA's CellConstructor.
+This code generates an output file 'name_phononTB_hr.dat' which is an input of wannier90/wanniertools.
+Inputs are output files from Quantum Espresso. Mainly the 'name.dat{0,1,2,...}' files, which are read and parsed using SSCHA's CellConstructor.
 
 TB_hr.dat file format can be seen here: https://wannier90.readthedocs.io/en/latest/user_guide/wannier90/files/#seedname_centresxyz
+
+Usage:
+python QE2TBDAT.py PathTo/name.dyn N_irr_q [ASR], []=optional
+
+ASR options: 
+- 'no' (default)
+- 'simple'
+- 'crystal'
+
 
 """
 
@@ -13,6 +22,7 @@ import cellconstructor as CC
 import cellconstructor.Phonons
 from cellconstructor.Units import MASS_RY_TO_UMA
 import sys
+import symph
 
 def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 10, fill = '█', printEnd = "\r"):
     """
@@ -254,14 +264,14 @@ if __name__ == '__main__':
     # Handle inputs from terminal
 
     try:
-        dynprefix = str(sys.argv[1])
+        dynprefix =str(sys.argv[1])
     except IndexError:
-        raise IndexError('Missing file name name.dyn. Usage: \'python QE2TBDAT.py name.dyn N_irr_q [ASR], []=optioinal \'')
+        raise IndexError('Missing file name name.dyn. Usage: \'python QE2TBDAT.py name.dyn N_irr_q [ASR], []=optional \'')
 
     try:
         nqirrs = int(sys.argv[2])
     except IndexError:
-        raise IndexError('Missing number of irreducible q points N_irr_q. Usage: \'python QE2TBDAT.py name.dyn N_irr_q [ASR], []=optioinal \'')
+        raise IndexError('Missing number of irreducible q points N_irr_q. Usage: \'python QE2TBDAT.py name.dyn N_irr_q [ASR], []=optional \'')
 
     try:
         asr = str(sys.argv[3])
@@ -276,12 +286,14 @@ if __name__ == '__main__':
     dyn = CC.Phonons.Phonons()
     dyn.LoadFromQE(fildyn_prefix=dynprefix, nqirr=nqirrs)
 
-    #dyn.InterpolateMesh([1,1,1])
+    
+
+    #dyn = dyn.InterpolateMesh(dyn.GetSupercell(), lo_to_splitting=True)
     if symmetrize:
         dyn.Symmetrize(verbose=False, asr=asr, use_spglib=False)
-
     super_dyn = dyn.GenerateSupercellDyn(dyn.GetSupercell())
-
+    
+    #print(len(dyn.q_tot))
     #print(dyn.dielectric_tensor)
     #print(dyn.effective_charges)
 
@@ -312,10 +324,15 @@ if __name__ == '__main__':
         )
     print("Done!")
     
+
+    fc = dyn.GetRealSpaceFC(supercell_array=dyn.GetSupercell())
+
+    
+
     # Finally write the TB_hr.dat file
     print('Writing file...')
     write_phonon_hr(
-            np.transpose(np.reshape(dyn.GetRealSpaceFC(supercell_array=dyn.GetSupercell()),(num_satom,3,num_satom,3)),axes=(0,2,1,3))*factor**2,
+            np.transpose(np.reshape(fc,(num_satom,3,num_satom,3)),axes=(0,2,1,3))*factor**2,
             svecs,
             mass,
             multi,
