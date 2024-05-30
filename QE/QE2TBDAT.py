@@ -94,6 +94,7 @@ def smallest_vectors(spos, pos, sbasis, symprec=1e-12):
             for k in range(npoints):
                 
                 vecs[k] = spos[i]-pos[j]+lattice_points[k]
+                
                 length[k] = np.linalg.norm(vecs[k])
             
             minimum = None
@@ -264,7 +265,7 @@ if __name__ == '__main__':
     # Handle inputs from terminal
 
     try:
-        dynprefix =str(sys.argv[1])
+        dynprefix = str(sys.argv[1])
     except IndexError:
         raise IndexError('Missing file name name.dyn. Usage: \'python QE2TBDAT.py name.dyn N_irr_q [ASR], []=optional \'')
 

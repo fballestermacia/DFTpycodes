@@ -9,7 +9,7 @@ set pointsize 0.8
 #set ylabel font ",24"
 set ylabel offset 0.5,0
 set xrange [0:    5.90622]
-emin=   -0.567675
+emin=   -0.500036
 emax=   14.712173
 set yrange [emin: emax]
 set ylabel "Frequency (THz)"
