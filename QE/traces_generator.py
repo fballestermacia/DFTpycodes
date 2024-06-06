@@ -77,7 +77,7 @@ def symmetryeigval(modefunc,r,t, latticevec, permatq, bandindices):
     
     l = len(bandindices)
     if l == 1:
-        eigval =np.matmul(np.transpose(np.conjugate(modefunc[bi].flatten())),np.matmul(symoperator,modefunc[bi].flatten()))
+        eigval =np.matmul(np.transpose(np.conjugate(modefunc[bandindices].flatten())),np.matmul(symoperator,modefunc[bandindices].flatten()))
     
     else:
         mat = np.zeros((l,l), dtype=np.complex128)
@@ -135,8 +135,8 @@ if __name__ == '__main__':
 
     
     
-    qlabels, positions, qpoints = utilsQE.readHighSymPointsPhonon(r"data/AgP2/Phonons/noLOTO/matdyn.in", retKpoints=True)
-    notqpoints, bands = utilsQE.readPhononbandFreq(r"data/AgP2/Phonons/noLOTO/AgP2.newHSP.freq.gp")
+    qlabels, positions, qpoints = utilsQE.readHighSymPointsPhonon(r"data/AgP2/Phonons/444/matdyn.in", retKpoints=True)
+    notqpoints, bands = utilsQE.readPhononbandFreq(r"data/AgP2/Phonons/444/AgP2.newHSP.freq.gp")
     
 
     gammaindex = qpoints.index([0,0,0])
@@ -184,7 +184,7 @@ if __name__ == '__main__':
     atmposcov = atmpos#covariant_coordinates(basisvec[:],atmpos)
     #print(atmposcov)
 
-    with open(r"QE_projects\AgP2_noLOTO_TRACES.txt",'w') as f:
+    with open(r"data/AgP2/Phonons/444/traces.txt",'w') as f:
         f.write(str(len(bands))+'\n')
         f.write('0'+'\n')
         
@@ -213,7 +213,7 @@ if __name__ == '__main__':
             #mapping_little_group, rotationslgroup, translationslgroup = findlg(rotations, translations, symk[ik])
 
 
-            modes = utilsQE.readModesatKpoin(symk[ik],r'data/AgP2/Phonons/noLOTO/matdyn.modes', scffile=r'data/AgP2/Phonons/noLOTO/AgP2.scf.pwo')
+            modes = utilsQE.readModesatKpoin(symk[ik],r'data/AgP2/Phonons/444/matdyn.modes', scffile=r'data/AgP2/Phonons/444/AgP2.scf.pwo')
             
             '''for i, m in enumerate(modes):
                 for j, m2 in enumerate(modes):
