@@ -138,8 +138,8 @@
  OmegaMax :        110.00000
  OmegaNum :     50
  OmegaNum_unfold :    200
- Nk1 :    350
- Nk2 :    120
+ Nk1 :    200
+ Nk2 :     10
  Nk3 :     12
  NP number of principle layers  :      2
  Tmin(Kelvin)  :          0.00000
@@ -597,7 +597,7 @@ Born_Charge for atom  12  Ag4
  Time cost for readinput is about            0.005 s
   
  >> We finished the symmetry reducing of the kpoints in the kcube
-  Number of kpoints mesh is     504000
+  Number of kpoints mesh is      24000
   Number of symmetry reduced kpoints is          0
   
  Time cost for symmetry is about            0.000 s
@@ -688,24 +688,7 @@ Born_Charge for atom  12  Ag4
   << Read Hmn_R.data successfully
   
  >> Start of calculating bulk band
- Time cost for BulkBand is about            3.596 s
- << End of calculating bulk band
-  
- Time cost for whole program is about            3.908 s
-  
-  
-  =======================================================================
-  Congratulations! you finished the calculation.
-  I hope you could find something useful from this calculation.
-  If so, I would like to ask you to cite our this paper:
-  
-  WannierTools : An open-source software package for novel topological materials
-  QuanSheng Wu and ShengNan Zhang and Hai-Feng Song and Matthias Troyer and Alexey A. Soluyanov
-  Computer Physics Communications 224, 405 (2018)
-  https://doi.org/10.1016/j.cpc.2017.09.033
-  
-  For bugs, please report to wuquansheng@gmail.com                   
-  or wanniertools@groups.google.com.                 
-  More information could find on www.wanniertools.com            
-  See you next time :)
-  =======================================================================
+ there is something wrong with Hamk_bulk
+ i1, i2           2          15
+ value at (i1, i2)  (2.82185655191426058E-003,-3.10410387975638798E-006)
+ value at (i2, i1)   (2.82010013925017376E-003,3.10410387975638798E-006)

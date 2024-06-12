@@ -28,9 +28,9 @@ ax.scatter(newpos[:,0],newpos[:,1],newpos[:,2],marker='o',linewidths=1, c='r')
 #ax.quiver(newpos[:,0],newpos[:,1],newpos[:,2], polvec[:],b,b, length=0.5)
 
 #ax.quiver(newpos[:,0],newpos[:,1],newpos[:,2], polvec[natms:2*natms],polvec[2*natms:],polvec[0:natms], length=0.5)
-ax.quiver(newpos[:,0],newpos[:,1],newpos[:,2], polvec[:,1],polvec[:,2],polvec[:,0], length=10)
+ax.quiver(newpos[:,0],newpos[:,1],newpos[:,2], polvec[:,1],polvec[:,2],polvec[:,0], length=0.1)
 
-ax.set_title("Surfcace mode, real part")
+ax.set_title("Surface mode, real part")
 ax.set_xlabel('X')
 ax.set_ylabel('Y')
 ax.set_zlabel('Z')
