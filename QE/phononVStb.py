@@ -53,13 +53,13 @@ factor = 0.123983#*0.24180
 thztomev = 4.15665538536
 
 # Let us define the PATH in the brilluin zone and the total number of points
-PATH = "EAGBDCZGYCE"
+PATH = "XWLGXBKUG"
 N_POINTS = 1000
 # Here we define the position of the special points
-SPECIAL_POINTS = {"G": [0,0,0],"E": [.5, .5, .5],"A": [.5, 0, .5],"B": [0, 0, .5],"D": [0, .5, .5],"C": [.5, .5, 0],"Z": [0, .5, 0],"Y": [.5, 0, 0]}
+SPECIAL_POINTS = {"G": [0,0,0],"W": [.5, .25, .75],"X": [.5, 0, .5],"L": [.5, .5, .5],"B": [.5, .5, 1],"K": [.375, .375, .75],"U": [.125, .125, .25]}
 
-SSCHA_DYN = 'data/AgP2/Phonons/444/dynmats/AgP2.dyn'
-NQIRR2 = 30
+SSCHA_DYN = r'data/PbTe/bigcell/PbTe.dyn'
+NQIRR2 = 4
 
 sscha_dyn = CC.Phonons.Phonons(SSCHA_DYN, NQIRR2)
 qpath, data = CC.Methods.get_bandpath(sscha_dyn.structure.unit_cell,PATH,SPECIAL_POINTS,N_POINTS)
@@ -69,15 +69,15 @@ nmodes = sscha_dyn.structure.N_atoms * 3
 
 
 
-qpoints, bands = utilsQE.readPhononbandFreq(r"data/AgP2/Phonons/444/AgP2.newHSP.freq.gp")
+qpoints, bands = utilsQE.readPhononbandFreq(r"data/PbTe/bigcell/PbTe.freq.gp")
 
-qlabels, positions = utilsQE.readHighSymPointsPhonon(r"data/AgP2/Phonons/444/matdyn.newHSP.in")
+qlabels, positions = utilsQE.readHighSymPointsPhonon(r"data/PbTe/bigcell/matdyn.in")
 
 
 bands *= factor
 
 
-tbqs, tbbandsperline = readpathbulkeks(qlabels, 'DFTpycodes/WTProj/bulkek.dat')
+tbqs, tbbandsperline = readpathbulkeks(qlabels, r'data/PbTe/bigcell/bulkek.dat')
 
 tbbandsperline *= thztomev
 

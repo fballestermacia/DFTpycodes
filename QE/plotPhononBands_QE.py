@@ -4,9 +4,9 @@ import utilsQE
 
 
 factor = 0.123983#*0.24180
-qpoints, bands = utilsQE.readPhononbandFreq(r"data/AgP2/Phonons/444/AgP2.newHSP.freq.gp")
+qpoints, bands = utilsQE.readPhononbandFreq(r"data/Al2Te4Zn/444/Al2Te4Zn1.freq.gp")
 
-qlabels, positions = utilsQE.readHighSymPointsPhonon(r"data/AgP2/Phonons/444/matdyn.newHSP.in")
+qlabels, positions = utilsQE.readHighSymPointsPhonon(r"data/Al2Te4Zn/444/matdyn.in")
 
 bands *= factor
 

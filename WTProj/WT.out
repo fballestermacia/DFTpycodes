@@ -281,7 +281,7 @@ Ag4     pz      px      py
 >> The lattice constant c ratio is:     1.000000
 >> Origin_cell in unit of Folded_cell: R1      1.000000    0.000000    0.000000
 >> Origin_cell in unit of Folded_cell: R2      0.000000    1.000000    0.000000
->> Origin_cell in unit of Folded_cell: R3      0.000000    0.000000    1.000000
+>> Origin_cell in unit of Folded_cell: R3     -0.000000    0.000000    1.000000
  
  
 >>> Atom position and magnetic moment of Unfolded lattice
@@ -594,7 +594,7 @@ Born_Charge for atom  12  Ag4
     -0.44122     0.50323    -0.22140
      0.02925    -0.09012     0.45371
  <<<Read wt.in file successfully
- Time cost for readinput is about            0.005 s
+ Time cost for readinput is about            0.006 s
   
  >> We finished the symmetry reducing of the kpoints in the kcube
   Number of kpoints mesh is      24000
@@ -688,7 +688,24 @@ Born_Charge for atom  12  Ag4
   << Read Hmn_R.data successfully
   
  >> Start of calculating bulk band
- there is something wrong with Hamk_bulk
- i1, i2           2          15
- value at (i1, i2)  (2.82185655191426058E-003,-3.10410387975638798E-006)
- value at (i2, i1)   (2.82010013925017376E-003,3.10410387975638798E-006)
+ Time cost for BulkBand is about            1.289 s
+ << End of calculating bulk band
+  
+ Time cost for whole program is about            1.517 s
+  
+  
+  =======================================================================
+  Congratulations! you finished the calculation.
+  I hope you could find something useful from this calculation.
+  If so, I would like to ask you to cite our this paper:
+  
+  WannierTools : An open-source software package for novel topological materials
+  QuanSheng Wu and ShengNan Zhang and Hai-Feng Song and Matthias Troyer and Alexey A. Soluyanov
+  Computer Physics Communications 224, 405 (2018)
+  https://doi.org/10.1016/j.cpc.2017.09.033
+  
+  For bugs, please report to wuquansheng@gmail.com                   
+  or wanniertools@groups.google.com.                 
+  More information could find on www.wanniertools.com            
+  See you next time :)
+  =======================================================================

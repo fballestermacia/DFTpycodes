@@ -2,7 +2,7 @@ import numpy as np
 import spglib as spg
 import ase.io as io
 import ase as ase
-from spgrep import get_spacegroup_irreps
+from spgrep import get_spacegroup_irreps,get_spacegroup_irreps_from_primitive_symmetry
 import utilsQE
 #from cellconstructor.Methods import covariant_coordinates
 import su2rot
@@ -47,7 +47,7 @@ def band_indices(bandsatqpoint, tol=1e-3):
     return indices
 
 
-def permutation_matrix(pos,r,t,q,sym_prec=4):
+def permutation_matrix(pos,r,t,q,sym_prec=7):
     
     num_atoms = len(pos)
     permu = np.zeros([num_atoms,num_atoms], dtype='complex')
@@ -58,8 +58,8 @@ def permutation_matrix(pos,r,t,q,sym_prec=4):
         for j2 in range(num_atoms):
             diff = new_pos-pos[j2]
             if (abs(diff - np.rint(diff)) < 10**(-1*sym_prec)).all():
-                phase = np.dot(q, new_pos-pos[j2])
-
+                phase = round(np.dot(q, new_pos-pos[j2]),3)
+                
                 permu[j2,j] = np.exp(-2j*np.pi*phase)
 
     return permu 
@@ -71,7 +71,8 @@ def similarity_transformation(U, mat):
 
 
 def symmetryeigval(modefunc,r,t, latticevec, permatq, bandindices):
-    U = latticevec
+    U = np.transpose(latticevec)
+    
     O = similarity_transformation(U,r)
     symoperator = np.kron(permatq,O)
     
@@ -112,9 +113,18 @@ def findlg(rk,t,q,symprec=1e-5):
 
 if __name__ == '__main__':
     
-    factor = 0.123983
+    tracesfile = r'data/PbTe/444/PbTetraces.txt'
+
+    scf_file = r'data/PbTe/444/PbTe.scf.pwi'
+    scfoutfile = r'data/PbTe/444/PbTe.scf.pwo'
+
+    matdyninfile = r"data/PbTe/444/tracesHSP/matdyn.in"
+    frecgpfile = r"data/PbTe/444/tracesHSP/PbTe.freq.gp"
+    modesfile = r'data/PbTe/444/tracesHSP/matdyn.modes'
+
+    factor = 0.123983/1000 #cm^-1 to eV
     
-    scf_file = r'data/AgP2/Phonons/noLOTO/AgP2.scf.pwi'
+    
     structure = io.read(scf_file)
 
     basisvec = structure.get_cell()
@@ -123,10 +133,29 @@ if __name__ == '__main__':
     recbasis = structure.cell.reciprocal()
     
     
-    sym_data = spg.get_symmetry_dataset((basisvec,atmpos,atmnum))
-    rotations = sym_data.get("rotations")
-    translations = sym_data.get("translations")
+
+    refinedbasis, refinedatmpos,refinedatmnum=spg.standardize_cell(cell=(basisvec,atmpos,atmnum))
+    sym_data = spg.get_symmetry_dataset((basisvec, atmpos, atmnum))
+
+    #print(spg.get_symmetry_dataset((refinedbasis,refinedatmpos,refinedatmnum)).get('number'))
+
+    fullrotations = sym_data.get("rotations")
+    fulltranslations = sym_data.get("translations")
+    
+    tmat = sym_data.get('transformation_matrix')
+    
+    maskrot = np.arange(len(fullrotations))#np.unique(fullrotations,return_index=True, axis=0)
+    maskrot = np.sort(maskrot)
+    #print(rotations, maskrot)
+    rotations = fullrotations[maskrot]
+    translations = fulltranslations[maskrot]
+
+    vectorsym = spg.get_symmetry_from_database(sym_data.get("hall_number"))
+    vectorrot = vectorsym.get('rotations')
+    vectortrans = vectorsym.get('translations')
+
     SG = sym_data.get("number")
+    #print('Space group ',SG)
     nsym = len(rotations)
     SU2=np.zeros((nsym,2,2),dtype=np.complex128)
     for i in range(nsym):
@@ -135,8 +164,9 @@ if __name__ == '__main__':
 
     
     
-    qlabels, positions, qpoints = utilsQE.readHighSymPointsPhonon(r"data/AgP2/Phonons/444/matdyn.in", retKpoints=True)
-    notqpoints, bands = utilsQE.readPhononbandFreq(r"data/AgP2/Phonons/444/AgP2.newHSP.freq.gp")
+    qlabels, positions, qpoints = utilsQE.readHighSymPointsPhonon(matdyninfile, retKpoints=True)
+    notqpoints, bands = utilsQE.readPhononbandFreq(frecgpfile)
+    
     
 
     gammaindex = qpoints.index([0,0,0])
@@ -157,34 +187,35 @@ if __name__ == '__main__':
     for i in np.sort(indices):
         newqpoints.append(dummyqo[i])
         newpos.append(dummypos[i])
-    
+
     
     
     newbands = np.transpose(bands[:,newpos])
 
-    
+    newbands *= factor
     
     bandindex = []
     
     for i in range(len(newbands)):
         #print(newbands)
-        bandindex.append(band_indices(newbands[i],tol=5e-3))
+        bandindex.append(band_indices(newbands[i],tol=2.5e-15))
         #stop = stop
     
-    newbands *= factor
+    
     
     for i in range(len(newbands)):
         for j in range(len(newbands[i])):
-            if abs(newbands[i][j]) < 5e-2:
+            if abs(newbands[i][j]) < 5e-5:
                 newbands[i][j] = 0.
     
     
     
     
-    atmposcov = atmpos#covariant_coordinates(basisvec[:],atmpos)
-    #print(atmposcov)
+    atmposcov = atmpos
 
-    with open(r"data/AgP2/Phonons/444/traces.txt",'w') as f:
+    
+
+    with open(tracesfile,'w') as f:
         f.write(str(len(bands))+'\n')
         f.write('0'+'\n')
         
@@ -204,20 +235,43 @@ if __name__ == '__main__':
             f.write('\n')
         
         symk=newqpoints
-        nsymk = len(newqpoints)
+        
+        nsymk = len(symk)
+        
         for ik in range(nsymk):
-            irreps, rotationslgroup, translationslgroup, mapping_little_group = get_spacegroup_irreps(
-                basisvec, atmpos, atmnum, symk[ik]
+            
+            
+            irreps, rotationslgroup, translationslgroup, dummymapping_little_group = get_spacegroup_irreps(
+                refinedbasis[:,:], refinedatmpos, refinedatmnum, symk[ik]
             )
             
-            #mapping_little_group, rotationslgroup, translationslgroup = findlg(rotations, translations, symk[ik])
-
-
-            modes = utilsQE.readModesatKpoin(symk[ik],r'data/AgP2/Phonons/444/matdyn.modes', scffile=r'data/AgP2/Phonons/444/AgP2.scf.pwo')
+            dummyirreps, mapping_little_group = get_spacegroup_irreps_from_primitive_symmetry(rotations,translations,symk[ik])
             
-            '''for i, m in enumerate(modes):
-                for j, m2 in enumerate(modes):
-                    print(i, j, np.dot(np.array(np.conjugate(m2)).flatten(),np.array(m).flatten()))'''
+            
+            #print(mapping_little_group)
+            #
+            #print(findlg(rotations,translations,symk[ik]))
+            #print(similarity_transformation(basisvec,rotationslgroup[-1]),rotations[-3])
+            #print(dummymapping_little_group)
+            #print(len(rotationslgroup))
+            
+            #mapping_little_group, rotationslgroup, translationslgroup = findlg(rotations, translations, symk[ik])
+            
+            
+
+            lmaskrot = mapping_little_group
+            lmaskrot = np.sort(lmaskrot)
+            rotationslgroup = rotations[lmaskrot]
+            translationslgroup = translations[lmaskrot]
+            
+            
+            
+            
+
+
+            modes = utilsQE.readModesatKpoin(symk[ik],modesfile, scffile=scfoutfile)
+            
+            
 
             lgtag = mapping_little_group
             f.write(str(len(lgtag))+'\n')
@@ -230,9 +284,9 @@ if __name__ == '__main__':
                 #print(bi)
                 for iopr in range(len(lgtag)):
 
-                    symeigval = symmetryeigval(np.array(modes),rotationslgroup[iopr], translationslgroup[iopr], basisvec[:], 
+                    symeigval = symmetryeigval(np.array(modes),rotationslgroup[iopr], translationslgroup[iopr], basisvec, 
                                                     permutation_matrix(atmpos,rotationslgroup[iopr], translationslgroup[iopr], symk[ik]), bi)
 
-                    f.write('{:10.5f}{:10.5f}'.format(np.real(symeigval) ,np.imag(symeigval)))
+                    f.write('{:10.5f}{:10.5f}'.format(np.round(np.real(symeigval),10) ,np.round(np.imag(symeigval),10)))
                 f.write('\n')
         
