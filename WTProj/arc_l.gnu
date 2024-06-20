@@ -18,7 +18,7 @@ set xlabel "K_1 (1/{\305})"
 set ylabel "K_2 (1/{\305})"
 set ylabel offset 1, 0
 set colorbox
-set xrange [-0.27091: 0.27091]
-set yrange [-0.33152: 0.33152]
+set xrange [-0.51195: 0.51195]
+set yrange [-0.62648: 0.62648]
 set pm3d interpolate 2,2
 splot 'arc.dat_l' u 1:2:3 w pm3d

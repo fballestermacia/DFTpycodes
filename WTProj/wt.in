@@ -6,9 +6,9 @@ Package = 'QE'
 
 &CONTROL
 !> bulk band structure calculation flag
-BulkBand_calc         = T !T
+BulkBand_calc         = F !T
 SlabBand_calc         = F !T
-LOTO_correction       = T !F
+LOTO_correction       = F !F
 BulkFS_calc           = F !T
 BulkGap_cube_calc     = F
 BulkGap_plane_calc    = F
@@ -20,7 +20,7 @@ SlabArc_calc          = F !T
 SlabQPI_calc          = F
 Z2_3D_calc            = F
 SlabSpintexture_calc  = F
-Wanniercenter_calc    = F !T
+Wanniercenter_calc    = T !T
 BerryPhase_calc       = F
 BerryCurvature_calc   = F
 EffectiveMass_calc    = F
@@ -31,24 +31,19 @@ WeylChirality_calc    = F
 
 ATOM_POSITIONS
 12
-Cartesian                          ! Direct or Cartisen coordinate
-P1   2.33052858  4.52463623  2.96816942
-P2   2.25201043  2.0172866   0.58059954
-P3   0.69802083  0.49006304  4.12936849
-P4   0.77653898  2.99741268  6.51693837
-P5   1.9718312   1.33870596  5.69811345
-P6   -0.49727139  3.8460556   4.94819341
-P7   1.05671821  3.67599331  1.39942446
-P8   3.5258208   1.16864367  2.1493445
-Ag1   3.40831086  2.73807244  4.26612932
-Ag2   -1.93375105  0.2307228   6.38017754
-Ag3   -0.37976145  2.27662683  2.83140859
-Ag4   4.96230046  4.78397647  0.71736036
-
-ATOM_MASS
-12
-1 1 1 1 1 1 1 1 1 1 1 1
-30.973762 30.973762 30.973762 30.973762 30.973762 30.973762 30.973762 30.973762 107.8682 107.8682 107.8682 107.8682 
+Direct                          ! Direct or Cartisen coordinate
+P1            0.5915846800       0.9022746900       0.4181970500
+P2            0.4084153200       0.4022746900       0.0818029500
+P3            0.4084153200       0.0977253100       0.5818029500
+P4            0.5915846800       0.5977253100       0.9181970500
+P5            0.7279374300       0.2669563800       0.8028295900
+P6            0.2720625700       0.7669563800       0.6971704100
+P7            0.2720625700       0.7330436200       0.1971704100
+P8            0.7279374300       0.2330436200       0.3028295900
+Ag1           0.8598394300       0.5460093000       0.6010717200
+Ag2           0.1401605700       0.0460093000       0.8989282800
+Ag3           0.1401605700       0.4539907000       0.3989282800
+Ag4           0.8598394300       0.9539907000       0.1010717200
 
 
 WEYL_CHIRALITY
@@ -74,9 +69,9 @@ E_arc = 106        ! energy for calculate Fermi Arc
 OmegaNum = 50     ! omega number
 OmegaMin =  100      ! energy interval in unit of eV
 OmegaMax =  110     ! energy interval in unit of eV
-Nk1 = 200           ! number k points
-Nk2 = 10           ! number k points
-Nk3 = 12            ! number k points
+Nk1 = 260           ! number k points
+Nk2 = 260           ! number k points
+Nk3 = 260            ! number k points
 NP = 2             ! number of principle layers
 Gap_threshold = 0.0001 ! threshold for GapCube output
 Tmin = 0
@@ -89,21 +84,21 @@ KPLANE_SLAB
 0.0  1.0      ! The second vector to define 2D k plane  for arc plots
 
 KPLANE_BULK
-0.00  0.00  0.00   ! Original point for 3D k plane
+0.00  0.50  0.00   ! Original point for 3D k plane
 0.00  0.00  1.00   ! The first vector to define 3d k space plane
 0.00  1.00  0.00   ! The second vector to define 3d k space plane
 
 KCUBE_BULK
--0.50  -0.50  -0.50   ! Original point for 3D k plane
+-0.00  -0.00  -0.00   ! Original point for 3D k plane
 1.00  0.00  0.00   ! The first vector to define 3d k space plane
 0.00  1.00  0.00   ! The second vector to define 3d k space plane
 0.00  0.00  1.00   ! The third vector to define 3d k cube
 
 LATTICE
 Angstrom
-6.1365281674978283    0.0000000000000000    0.0000000000000000
-0.0000000000000000    5.0146989099999999    0.0000000000000000
--3.1079789745344861    0.0000000000000000    7.0975373947360678
+   6.1365281675       0.0000000000       0.0000000000
+   0.0000000000       5.0146989100       0.0000000000
+  -3.1079789745       0.0000000000       7.0975373947
 
 PROJECTORS
 3 3 3 3 3 3 3 3 3 3 3 3
@@ -123,7 +118,7 @@ Ag4 pz px py
 
 SURFACE
 1 0 0
-0 1 0
+0 0 1
 
 KPATH_SLAB
 5
@@ -159,6 +154,12 @@ Z  0.000000  0.500000  0.000000     G  0.000000  0.000000  0.000000
 G  0.000000  0.000000  0.000000     Y2  0.500000  0.000000  0.000000
 Y2  0.500000  0.000000  0.000000     C2  0.500000  0.500000  0.000000
 C2  0.500000  0.500000  0.000000     E  0.500000  0.500000  0.500000
+
+ATOM_MASS
+12
+1 1 1 1 1 1 1 1 1 1 1 1
+30.973762 30.973762 30.973762 30.973762 30.973762 30.973762 30.973762 30.973762 107.8682 107.8682 107.8682 107.8682 
+
 
 LOTO_DT
 14.581365186034 0.000000000000 -0.043974208398

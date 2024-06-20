@@ -16,14 +16,14 @@ set view 0,0
 #set ylabel font ",36"
 #set xtics offset 0, -1
 set ylabel offset -1, 0 
-set xrange [0:    3.08590]
-set ylabel "Energy (eV)"
-set yrange [  -5.64012: 202.45723]
-set xtics ("  G"    0.00000,"  X"    0.27091,"  M"    0.60243,"  Y"    0.87334,"  G"    1.20486,"  M"    1.63299)
-set arrow from    0.27091,  -5.64012 to    0.27091, 202.45723 nohead
-set arrow from    0.60243,  -5.64012 to    0.60243, 202.45723 nohead
-set arrow from    0.87334,  -5.64012 to    0.87334, 202.45723 nohead
-set arrow from    1.20486,  -5.64012 to    1.20486, 202.45723 nohead
+set xrange [0:    2.84370]
+set yrange [  -2.76998:  14.70869]
+set ylabel "Frequency (THz)"
+set xtics ("  G"    0.00000,"  X"    0.55888,"  M"    1.00151,"  Y"    1.56040,"  G"    2.00303,"  M"    2.84370)
+set arrow from    0.55888,  -2.76998 to    0.55888,  14.70869 nohead
+set arrow from    1.00151,  -2.76998 to    1.00151,  14.70869 nohead
+set arrow from    1.56040,  -2.76998 to    1.56040,  14.70869 nohead
+set arrow from    2.00303,  -2.76998 to    2.00303,  14.70869 nohead
 #rgb(r,g,b) = int(r)*65536 + int(g)*256 + int(b)
 #plot 'slabek.dat' u 1:2:(rgb(255,$3, 3)) w lp lw 2 pt 7  ps 1 lc rgb variable
 # (a) 

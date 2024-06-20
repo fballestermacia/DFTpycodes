@@ -58,8 +58,8 @@ N_POINTS = 1000
 # Here we define the position of the special points
 SPECIAL_POINTS = {"G": [0,0,0],"W": [.5, .25, .75],"X": [.5, 0, .5],"L": [.5, .5, .5],"B": [.5, .5, 1],"K": [.375, .375, .75],"U": [.125, .125, .25]}
 
-SSCHA_DYN = r'data/PbTe/bigcell/PbTe.dyn'
-NQIRR2 = 4
+SSCHA_DYN = r'data/Al2Te4Zn/444/Al2Te4Zn1.dyn'
+NQIRR2 = 14
 
 sscha_dyn = CC.Phonons.Phonons(SSCHA_DYN, NQIRR2)
 qpath, data = CC.Methods.get_bandpath(sscha_dyn.structure.unit_cell,PATH,SPECIAL_POINTS,N_POINTS)
@@ -69,15 +69,16 @@ nmodes = sscha_dyn.structure.N_atoms * 3
 
 
 
-qpoints, bands = utilsQE.readPhononbandFreq(r"data/PbTe/bigcell/PbTe.freq.gp")
+qpoints, bands = utilsQE.readPhononbandFreq(r"data/Al2Te4Zn/444/Al2Te4Zn1.freq.gp")
 
-qlabels, positions = utilsQE.readHighSymPointsPhonon(r"data/PbTe/bigcell/matdyn.in")
+qlabels, positions = utilsQE.readHighSymPointsPhonon(r"data/Al2Te4Zn/444/matdyn.in")
+
 
 
 bands *= factor
 
 
-tbqs, tbbandsperline = readpathbulkeks(qlabels, r'data/PbTe/bigcell/bulkek.dat')
+tbqs, tbbandsperline = readpathbulkeks(qlabels, r'data/Al2Te4Zn/444/bulkek.dat')
 
 tbbandsperline *= thztomev
 

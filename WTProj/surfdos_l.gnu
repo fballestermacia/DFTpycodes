@@ -23,13 +23,13 @@ set border lw 3
 set ylabel "Energy (eV)"
 #set xtics offset 0, -1
 #set ylabel offset -6, 0 
-set xrange [0:            1.63299]
+set xrange [0:            3.08590]
 set yrange [         100.00000:         109.80000]
-set xtics ("G"  0.00000,"X"  0.27091,"M"  0.60243,"Y"  0.87334,"G"  1.20486,"M"  1.63299)
-set arrow from  0.27091, 100.00000 to  0.27091, 109.80000 nohead front lw 3
-set arrow from  0.60243, 100.00000 to  0.60243, 109.80000 nohead front lw 3
-set arrow from  0.87334, 100.00000 to  0.87334, 109.80000 nohead front lw 3
-set arrow from  1.20486, 100.00000 to  1.20486, 109.80000 nohead front lw 3
+set xtics ("G"  0.00000,"X"  0.51195,"M"  1.13843,"Y"  1.65038,"G"  2.27685,"M"  3.08590)
+set arrow from  0.51195, 100.00000 to  0.51195, 109.80000 nohead front lw 3
+set arrow from  1.13843, 100.00000 to  1.13843, 109.80000 nohead front lw 3
+set arrow from  1.65038, 100.00000 to  1.65038, 109.80000 nohead front lw 3
+set arrow from  2.27685, 100.00000 to  2.27685, 109.80000 nohead front lw 3
 set pm3d interpolate 2,2
 splot 'dos.dat_l' u 1:2:3 w pm3d
 set terminal png truecolor enhanced font ", 30" size 1920, 1680
